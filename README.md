@@ -119,5 +119,5 @@ Invoke Ollama (keep_alive=0) ➔ Synthesize Claims ➔ Release Memory
 ---
 
 ## 👥 Academic Context
-- **Project**: Third-Year Computer Science Mini-Project
+- **Project**: Third-Year Information Technology Mini-Project
 - **Architecture**: EMTRIA v2.1
