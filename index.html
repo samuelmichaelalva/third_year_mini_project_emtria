@@ -3,755 +3,486 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EMTRIA — Evidence-Grounded Forensic Intelligence</title>
-  <meta name="description" content="EMTRIA: Multimodal Evidence-Grounded Crime Report Generation System. An evidence-grounded decision-support tool for preliminary forensic analysis.">
+  <title>EMTRIA — Evidence-Grounded Forensic Reporting</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app" class="app-container">
+  <div class="app-container">
 
-    <!-- TOP GLOBAL HEADER -->
+    <!-- TOP HEADER -->
     <header class="top-nav">
       <div class="nav-brand">
         <div class="logo-mark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="M9 12l2 2 4-4"/>
-          </svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="brand-text">
           <span class="brand-name">EMTRIA</span>
-          <span class="brand-sub">Forensic Intelligence Console</span>
+          <span class="brand-sub">Forensic Intelligence</span>
         </div>
       </div>
 
-      <nav class="nav-links">
-        <button class="nav-link" data-page="login" id="nav-login" onclick="window.navigateTo('login')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Examiner Auth
+      <!-- STEPPER BAR -->
+      <div class="wizard-stepper">
+        <button class="step-btn active" id="step-btn-1" onclick="window.goToStep(1)">
+          <span class="step-num">1</span>
+          <span class="step-title">Select Evidence</span>
         </button>
-        <button class="nav-link" data-page="cases" id="nav-cases" onclick="window.navigateTo('cases')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Case Archive
+        <div class="step-connector" id="connector-1"></div>
+        <button class="step-btn" id="step-btn-2" onclick="window.goToStep(2)">
+          <span class="step-num">2</span>
+          <span class="step-title">AI Processing</span>
         </button>
-        <button class="nav-link active" data-page="workspace" id="nav-workspace" onclick="window.navigateTo('workspace')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          Investigative Workspace
+        <div class="step-connector" id="connector-2"></div>
+        <button class="step-btn" id="step-btn-3" onclick="window.goToStep(3)">
+          <span class="step-num">3</span>
+          <span class="step-title">Verified Report</span>
         </button>
-        <button class="nav-link" data-page="settings" id="nav-settings" onclick="window.navigateTo('settings')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Hardware &amp; Diagnostics
-        </button>
-      </nav>
+      </div>
 
+      <!-- ACTIONS & THEME -->
       <div class="nav-actions">
-        <div class="badge-hardware">
-          <span class="status-dot green"></span>
-          <span class="hw-text">RTX 4050 6GB &#8282; Sequential</span>
-        </div>
-
-        <!-- Light/Dark Theme Toggle -->
-        <button id="theme-toggle" class="btn-icon" title="Toggle Dark/Light Mode" aria-label="Toggle theme">
-          <span class="theme-icon-slot">
-            <svg class="sun-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg class="moon-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </span>
+        <button id="theme-toggle" class="btn-icon" title="Toggle Theme" aria-label="Toggle Dark/Light Mode">
+          <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
 
-        <div class="user-pill" title="Current Authenticated Examiner">
+        <div class="user-pill">
           <div class="avatar-badge">SN</div>
-          <span class="user-name">Inv. Samuel N. (#4092)</span>
+          <span class="user-name">Inv. Samuel N.</span>
         </div>
       </div>
     </header>
 
+    <!-- MAIN BODY CONTENT -->
     <main class="page-content">
 
-      <!-- PAGE 1: EXAMINER AUTH -->
-      <section id="page-login" class="view-panel" style="display: none;">
-        <div class="auth-card-container">
-          <div class="auth-card">
-            <div class="auth-header">
-              <div class="auth-icon-wrap">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <h2>Examiner Authorization</h2>
-              <p>Chain-of-Custody Digital Verification Gateway</p>
-            </div>
-
-            <form class="auth-form" onsubmit="event.preventDefault(); window.navigateTo('workspace');">
-              <div class="form-group">
-                <label for="badge-id">Examiner / Badge Identification Number</label>
-                <div class="input-with-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  <input type="text" id="badge-id" value="DET-4092-IT" required placeholder="e.g. DET-4092">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="jurisdiction-select">Department / Forensic Unit</label>
-                <select id="jurisdiction-select" class="form-select">
-                  <option selected>Digital Forensics &amp; Evidence Unit (DFEU)</option>
-                  <option>Crime Scene Investigation Bureau (CSIB)</option>
-                  <option>Academic Research &amp; Validation Lab</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="case-key">Case Access Authorization Key</label>
-                <div class="input-with-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <input type="password" id="case-key" value="examiner-password" required>
-                </div>
-              </div>
-
-              <div class="legal-disclaimer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>Preliminary decision support only. All audit logs, traceable bounding boxes, and timestamps are cryptographically signed.</span>
-              </div>
-
-              <button type="submit" class="btn-primary w-full">
-                Verify Identity &amp; Enter Workspace
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 2: CASES ARCHIVE -->
-      <section id="page-cases" class="view-panel" style="display: none;">
-        <div class="cases-layout">
-          <div class="cases-header">
-            <div>
-              <h1 class="page-title">Evidence &amp; Case Archive</h1>
-              <p class="page-subtitle">Track, review, and initiate evidence-grounded preliminary forensic analyses</p>
-            </div>
-            <button class="btn-primary" onclick="alert('Initiating new case folder #CASE-2026-085'); window.navigateTo('workspace');">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              New Investigation Case
-            </button>
-          </div>
-
-          <div class="filter-toolbar">
-            <div class="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" placeholder="Search by Case ID, Scene Location, or Evidence Tag...">
-            </div>
-            <div class="filter-pills">
-              <button class="pill-btn active">All Cases (4)</button>
-              <button class="pill-btn">In Triage</button>
-              <button class="pill-btn">Report Generated</button>
-              <button class="pill-btn">Audited</button>
-            </div>
-          </div>
-
-          <div class="cases-grid">
-            <div class="case-card active-card" onclick="window.navigateTo('workspace')">
-              <div class="case-card-top">
-                <span class="case-id">#CASE-2026-084B</span>
-                <span class="status-badge green">Ready for Analysis</span>
-              </div>
-              <h3 class="case-title">Apartment 4B Entryway Disturbance</h3>
-              <p class="case-desc">Multimodal intake comprising high-res scene images, hallway CCTV footage, and initial 911 dispatch audio.</p>
-              <div class="evidence-tally">
-                <span class="tally-item">&#128247; 3 Photos</span>
-                <span class="tally-item">&#127909; 1 CCTV Video</span>
-                <span class="tally-item">&#127908; 1 Audio Clip</span>
-              </div>
-              <div class="case-card-footer">
-                <span class="case-date">Logged: Oct 04, 2026 &#8282; Lead: Inv. Samuel N.</span>
-                <button class="btn-secondary-sm">Open Workspace &rarr;</button>
-              </div>
-            </div>
-
-            <div class="case-card" onclick="window.navigateTo('workspace')">
-              <div class="case-card-top">
-                <span class="case-id">#CASE-2026-081</span>
-                <span class="status-badge blue">Report Generated</span>
-              </div>
-              <h3 class="case-title">Warehouse Perimeter Forced Entry</h3>
-              <p class="case-desc">Night-vision outdoor surveillance footage paired with perimeter audio sensor trip logs.</p>
-              <div class="evidence-tally">
-                <span class="tally-item">&#128247; 4 Photos</span>
-                <span class="tally-item">&#127909; 2 Videos</span>
-                <span class="tally-item">&#127908; 0 Audio</span>
-              </div>
-              <div class="case-card-footer">
-                <span class="case-date">Logged: Sep 28, 2026</span>
-                <button class="btn-secondary-sm">View Report &rarr;</button>
-              </div>
-            </div>
-
-            <div class="case-card" onclick="window.navigateTo('workspace')">
-              <div class="case-card-top">
-                <span class="case-id">#CASE-2026-079</span>
-                <span class="status-badge gray">Archived</span>
-              </div>
-              <h3 class="case-title">Commercial Retail Register Breach</h3>
-              <p class="case-desc">POS counter surveillance camera recordings and witness voice memo recordings.</p>
-              <div class="evidence-tally">
-                <span class="tally-item">&#128247; 2 Photos</span>
-                <span class="tally-item">&#127909; 1 Video</span>
-                <span class="tally-item">&#127908; 2 Audio</span>
-              </div>
-              <div class="case-card-footer">
-                <span class="case-date">Logged: Sep 19, 2026</span>
-                <button class="btn-secondary-sm">Archived &rarr;</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 3: INVESTIGATIVE WORKSPACE -->
-      <section id="page-workspace" class="view-panel active-panel">
-        
-        <div class="workspace-header">
-          <div class="case-meta-group">
-            <span class="case-active-pill">ACTIVE CASE</span>
-            <div>
-              <h2 class="case-active-id">#CASE-2026-084B</h2>
-              <div class="case-scene-name">Apartment 4B Entryway Disturbance &#8282; Multimodal Intake</div>
-            </div>
-          </div>
-          <div class="workspace-actions">
-            <div class="metric-pill">
-              <span class="status-dot green"></span>
-              <span>Grounding: 100% (7/7 Claims)</span>
-            </div>
-            <button class="btn-secondary" onclick="window.runAnalysisSimulation()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Run Pipeline
-            </button>
-            <button class="btn-primary" onclick="window.exportReport()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export JSON
-            </button>
-          </div>
+      <!-- ========================================================
+           STEP 1: SELECT & PREVIEW EVIDENCE
+           ======================================================== -->
+      <section id="wizard-step-1" class="step-view active">
+        <div class="step-header">
+          <div class="case-badge">CASE #CASE-2026-084B</div>
+          <h1 class="step-heading">Step 1: Review Crime Scene Evidence</h1>
+          <p class="step-subheading">Select and review the multimodal evidence collected from Apartment 4B before running AI analysis.</p>
         </div>
 
-        <div class="workspace-grid">
+        <div class="evidence-grid">
 
-          <!-- LEFT COLUMN: MULTIMODAL EVIDENCE VIEWER -->
-          <div class="card pane-card">
-
-            <!-- Modality Tab Switcher -->
-            <div class="pane-tabs">
-              <button class="tab-btn active" id="tab-image" onclick="window.switchModality('image')">
+          <!-- Card 1: Photo Evidence -->
+          <div class="evidence-box active-evidence" id="ev-card-image" onclick="window.selectEvidenceTab('image')">
+            <div class="evidence-box-header">
+              <div class="ev-tag photo-tag">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Image Evidence
-                <span class="tab-count">4</span>
-              </button>
-              <button class="tab-btn" id="tab-video" onclick="window.switchModality('video')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="3" width="15" height="14" rx="2" ry="2"/></svg>
-                CCTV Video
-                <span class="tab-count">3</span>
-              </button>
-              <button class="tab-btn" id="tab-audio" onclick="window.switchModality('audio')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                Audio / ASR
-                <span class="tab-count">3</span>
-              </button>
+                PHOTO EVIDENCE
+              </div>
+              <span class="ev-file">IMG_001.jpg</span>
+            </div>
+            
+            <div class="ev-preview-canvas">
+              <svg viewBox="0 0 400 240" class="mini-scene-svg">
+                <rect width="400" height="240" fill="#0f172a" rx="8"/>
+                <!-- Room outlines -->
+                <rect x="30" y="20" width="340" height="200" fill="none" stroke="#334155" stroke-dasharray="4 4" stroke-width="1.5"/>
+                <!-- Door -->
+                <rect x="50" y="30" width="60" height="170" fill="rgba(2, 132, 199, 0.15)" stroke="#0284c7" stroke-width="2" rx="3"/>
+                <text x="56" y="50" fill="#38bdf8" font-size="10" font-weight="bold" font-family="JetBrains Mono">DOOR</text>
+                <!-- Knife -->
+                <rect x="170" y="150" width="60" height="35" fill="rgba(6, 182, 212, 0.15)" stroke="#06b6d4" stroke-width="2" rx="3"/>
+                <text x="176" y="172" fill="#22d3ee" font-size="10" font-weight="bold" font-family="JetBrains Mono">KNIFE</text>
+                <!-- Stain -->
+                <circle cx="270" cy="165" r="22" fill="rgba(220, 38, 38, 0.2)" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 3"/>
+                <text x="254" y="169" fill="#f87171" font-size="9" font-weight="bold" font-family="JetBrains Mono">STAIN</text>
+              </svg>
             </div>
 
-            <!-- ===== IMAGE MODALITY ===== -->
-            <div class="modality-content active-modality" id="modality-image" style="display: block;">
+            <div class="evidence-box-footer">
+              <div class="ev-desc-title">Entryway Scene Overview</div>
+              <p class="ev-desc-text">Front door latch damaged, kitchen knife on floor, adjacent red liquid stain.</p>
+              <div class="ev-meta-info">
+                <span>Model: Florence-2-base</span>
+                <span class="badge-pill">4 Detections</span>
+              </div>
+            </div>
+          </div>
 
-              <!-- Evidence File Toolbar -->
-              <div class="evidence-toolbar">
-                <div class="file-selector">
-                  <span class="label-tiny">SOURCE:</span>
-                  <select class="dropdown-small" onchange="window.switchImageFile(this.value)">
-                    <option value="IMG_001" selected>IMG_001.jpg (Crime Scene Entryway)</option>
-                    <option value="IMG_002">IMG_002.jpg (Hallway Facing North)</option>
-                    <option value="IMG_003">IMG_003.jpg (Door Latch Macro)</option>
-                  </select>
+          <!-- Card 2: CCTV Video Evidence -->
+          <div class="evidence-box" id="ev-card-video" onclick="window.selectEvidenceTab('video')">
+            <div class="evidence-box-header">
+              <div class="ev-tag video-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="3" width="15" height="14" rx="2" ry="2"/></svg>
+                CCTV FOOTAGE
+              </div>
+              <span class="ev-file">VID_001.mp4</span>
+            </div>
+
+            <div class="ev-preview-canvas video-canvas">
+              <div class="cctv-preview-box">
+                <div class="cctv-stamp">&#9679; REC &#8212; CAM-04 (HALLWAY B)</div>
+                <div class="cctv-center-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </div>
-                <div class="box-toggle-group">
-                  <span class="toggle-label">Grounding Boxes</span>
-                  <label class="toggle-switch">
-                    <input type="checkbox" checked onchange="window.toggleBoundingBoxes(this.checked)">
-                    <span class="slider"></span>
-                  </label>
+                <div class="cctv-time-pill">00:01:23 / 00:03:00</div>
+              </div>
+            </div>
+
+            <div class="evidence-box-footer">
+              <div class="ev-desc-title">Hallway Security Feed</div>
+              <p class="ev-desc-text">Figure observed in corridor at 00:01:23, followed by physical door displacement at 00:02:08.</p>
+              <div class="ev-meta-info">
+                <span>Sampler: OpenCV 30fps</span>
+                <span class="badge-pill">2 Keyframes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: 911 Audio Evidence -->
+          <div class="evidence-box" id="ev-card-audio" onclick="window.selectEvidenceTab('audio')">
+            <div class="evidence-box-header">
+              <div class="ev-tag audio-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                DISPATCH AUDIO
+              </div>
+              <span class="ev-file">AUD_001.wav</span>
+            </div>
+
+            <div class="ev-preview-canvas audio-canvas">
+              <div class="audio-wave-preview">
+                <div class="wave-lines">
+                  <span style="height: 18px"></span><span style="height: 35px"></span><span style="height: 55px"></span>
+                  <span style="height: 42px"></span><span style="height: 60px"></span><span style="height: 25px"></span>
+                  <span style="height: 48px"></span><span style="height: 52px"></span><span style="height: 30px"></span>
+                  <span style="height: 45px"></span><span style="height: 20px"></span>
+                </div>
+                <div class="audio-transcript-snippet">
+                  "It sounded like the door just got kicked in — wood cracking, loud impact."
                 </div>
               </div>
+            </div>
 
-              <!-- Crime Scene SVG Canvas with Bounding Box Overlays -->
-              <div class="canvas-wrapper">
-                <svg viewBox="0 0 800 500" class="crime-scene-svg" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="sceneGrad" x1="0" y1="0" x2="800" y2="500" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#1e293b"/>
-                      <stop offset="50%" stop-color="#0f172a"/>
-                      <stop offset="100%" stop-color="#1a1a2e"/>
-                    </linearGradient>
-                    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.4"/>
-                    </pattern>
-                  </defs>
-                  <rect width="800" height="500" fill="url(#sceneGrad)"/>
-                  <rect width="800" height="500" fill="url(#gridPattern)"/>
+            <div class="evidence-box-footer">
+              <div class="ev-desc-title">911 Neighbor Call</div>
+              <p class="ev-desc-text">Neighbor reports loud impact and wood fracturing noises at timestamp 00:14.20.</p>
+              <div class="ev-meta-info">
+                <span>Model: Whisper-base</span>
+                <span class="badge-pill">3 Segments</span>
+              </div>
+            </div>
+          </div>
 
-                  <!-- Room boundary walls -->
-                  <rect x="60" y="40" width="680" height="420" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="8 4"/>
-                  <text x="400" y="25" text-anchor="middle" fill="#64748b" font-size="11" font-family="'JetBrains Mono', monospace">IMG_001.jpg — 2048×1280 — Florence-2 Grounding Active</text>
+        </div>
 
-                  <!-- Bounding Box 1: Door -->
-                  <g class="bbox-overlay" id="box-IMG_001_OBJ_01" onclick="window.selectEvidenceItem('IMG_001_OBJ_01')">
-                    <rect class="bbox-rect bbox-door" x="80" y="60" width="140" height="350" rx="3"/>
-                    <rect class="bbox-tag-bg bbox-door-tag" x="80" y="60" width="180" height="22" rx="3"/>
-                    <text class="bbox-tag-text" x="88" y="75">OBJ_01: Damaged Door</text>
+        <!-- Action Banner -->
+        <div class="wizard-action-bar">
+          <div class="action-info">
+            <strong>3 Multimodal Assets Ready:</strong> High-res photo, CCTV footage, and dispatch audio.
+          </div>
+          <button class="btn-primary-large" onclick="window.startProcessing()">
+            Run AI Grounding Analysis
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </section>
+
+
+      <!-- ========================================================
+           STEP 2: PROCESSING SIMULATION
+           ======================================================== -->
+      <section id="wizard-step-2" class="step-view">
+        <div class="step-header text-center">
+          <div class="case-badge">SEQUENTIAL PIPELINE EXECUTION</div>
+          <h1 class="step-heading">Step 2: Processing Evidence &amp; Verifying Claims</h1>
+          <p class="step-subheading">Running local AI models on your RTX 4050 GPU (6 GB VRAM) with zero cloud dependencies.</p>
+        </div>
+
+        <div class="pipeline-card">
+          <!-- Live Pipeline Stages -->
+          <div class="pipeline-stages">
+            
+            <div class="pipeline-step-item" id="pstep-1">
+              <div class="pstep-icon green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="pstep-content">
+                <div class="pstep-title">Stage 1: Vision Extraction (Florence-2-base)</div>
+                <div class="pstep-desc">Detected 4 physical evidence objects with pixel coordinate bounding boxes. Memory unloaded.</div>
+              </div>
+              <span class="pstep-status done">COMPLETED</span>
+            </div>
+
+            <div class="pipeline-step-item" id="pstep-2">
+              <div class="pstep-icon green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="pstep-content">
+                <div class="pstep-title">Stage 2: Speech &amp; Dialogue (Whisper-base)</div>
+                <div class="pstep-desc">Transcribed 911 audio into 3 timestamped speech segments. Memory unloaded.</div>
+              </div>
+              <span class="pstep-status done">COMPLETED</span>
+            </div>
+
+            <div class="pipeline-step-item" id="pstep-3">
+              <div class="pstep-icon green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="pstep-content">
+                <div class="pstep-title">Stage 3: Cross-Modal Temporal Matcher</div>
+                <div class="pstep-desc">Correlated CCTV door movement (00:02:08) with 911 acoustic impact report (00:14.20).</div>
+              </div>
+              <span class="pstep-status done">COMPLETED</span>
+            </div>
+
+            <div class="pipeline-step-item" id="pstep-4">
+              <div class="pstep-icon green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="pstep-content">
+                <div class="pstep-title">Stage 4: Deterministic Guardrail Validator</div>
+                <div class="pstep-desc">Verified 7/7 claims directly cite evidence IDs. 0 hallucinations detected.</div>
+              </div>
+              <span class="pstep-status done">100% GROUNDED</span>
+            </div>
+
+          </div>
+
+          <!-- Hardware Memory Card -->
+          <div class="hardware-footprint-box">
+            <div class="hw-footprint-info">
+              <span class="hw-chip-title">NVIDIA RTX 4050 6GB Laptop GPU</span>
+              <span class="hw-chip-val">Peak VRAM: 1.42 GB / 6.00 GB (Safe)</span>
+            </div>
+            <div class="hw-bar-track">
+              <div class="hw-bar-fill" style="width: 23.6%;"></div>
+            </div>
+          </div>
+
+          <div class="pipeline-action-row">
+            <button class="btn-secondary" onclick="window.goToStep(1)">&larr; Back to Evidence</button>
+            <button class="btn-primary-large" onclick="window.goToStep(3)">
+              View Verified Forensic Report &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========================================================
+           STEP 3: CLEAN VERIFIED FORENSIC REPORT
+           ======================================================== -->
+      <section id="wizard-step-3" class="step-view">
+        
+        <!-- Header Bar -->
+        <div class="report-top-bar">
+          <div>
+            <div class="report-badge-row">
+              <span class="status-badge green">GROUNDED REPORT</span>
+              <span class="case-id-txt">#CASE-2026-084B</span>
+            </div>
+            <h1 class="report-main-heading">Preliminary Forensic Assessment</h1>
+            <p class="report-main-sub">Apartment 4B Entryway Disturbance &#8212; 100% Citing Valid Evidence IDs</p>
+          </div>
+
+          <div class="report-btn-group">
+            <button class="btn-secondary" onclick="window.goToStep(1)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              New Analysis
+            </button>
+            <button class="btn-primary" onclick="window.printReport()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print / Export Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Two Column Clean Layout: Report Findings on Left, Interactive Evidence Viewer on Right -->
+        <div class="simple-workspace-grid">
+
+          <!-- LEFT: FINDINGS ACCORDION / LIST -->
+          <div class="findings-panel">
+
+            <!-- Category 1: Direct Observations -->
+            <div class="category-block">
+              <div class="category-header green-cat">
+                <div class="cat-title-wrap">
+                  <span class="cat-dot green"></span>
+                  <h3>1. Direct Observations (4)</h3>
+                </div>
+                <span class="cat-caption">Visually or acoustically grounded items</span>
+              </div>
+
+              <div class="findings-list">
+                
+                <div class="finding-simple-card active-card" onclick="window.showEvidenceDetail('door')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#128247; IMG_001_OBJ_01</span>
+                    <span class="confidence-tag">91% Conf.</span>
+                  </div>
+                  <p class="finding-body">
+                    Damaged wooden entryway door with latch fractured and frame splintering consistent with applied external force.
+                  </p>
+                </div>
+
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('knife')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#128247; IMG_001_OBJ_02</span>
+                    <span class="confidence-tag">87% Conf.</span>
+                  </div>
+                  <p class="finding-body">
+                    Metallic kitchen knife blade detected on floor surface proximate to center room.
+                  </p>
+                </div>
+
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('cctv')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#127909; VID_001 @ 00:01:23</span>
+                    <span class="confidence-tag">88% Conf.</span>
+                  </div>
+                  <p class="finding-body">
+                    CCTV hallway camera captures unidentified figure positioned outside Apartment 4B.
+                  </p>
+                </div>
+
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('audio')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#127908; AUD_001 @ 00:14.20</span>
+                    <span class="confidence-tag">Whisper ASR</span>
+                  </div>
+                  <p class="finding-body">
+                    Neighbor reports loud impact followed by distinct sound of wood cracking.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Category 2: Cautious Inferences -->
+            <div class="category-block">
+              <div class="category-header purple-cat">
+                <div class="cat-title-wrap">
+                  <span class="cat-dot purple"></span>
+                  <h3>2. Cautious Inferences (2)</h3>
+                </div>
+                <span class="cat-caption">Cross-modal temporal deductions</span>
+              </div>
+
+              <div class="findings-list">
+                
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('correlation')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#127909; CCTV + &#127908; Audio</span>
+                    <span class="inference-tag">TEMPORAL MATCH</span>
+                  </div>
+                  <p class="finding-body">
+                    Door displacement at 00:02:08 in CCTV correlates temporally with caller's report of wood recoil.
+                  </p>
+                </div>
+
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('phone')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn">&#128247; IMG_001_OBJ_04</span>
+                    <span class="inference-tag">INFERENCE</span>
+                  </div>
+                  <p class="finding-body">
+                    Overturned furniture and dislodged telephone suggest physical struggle or hasty exit.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Category 3: Lab Mandated -->
+            <div class="category-block">
+              <div class="category-header red-cat">
+                <div class="cat-title-wrap">
+                  <span class="cat-dot red"></span>
+                  <h3>3. Unverified Claims / Lab Mandated (1)</h3>
+                </div>
+                <span class="cat-caption">Requires physical laboratory confirmation</span>
+              </div>
+
+              <div class="findings-list">
+                
+                <div class="finding-simple-card" onclick="window.showEvidenceDetail('stain')">
+                  <div class="finding-top-row">
+                    <span class="evidence-link-btn red-btn">&#128247; IMG_001_OBJ_03</span>
+                    <span class="lab-tag">LAB ACTION REQUIRED</span>
+                  </div>
+                  <p class="finding-body">
+                    Red liquid pooling adjacent to knife. Cannot be confirmed as biological blood from pixels alone. Serology required.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: INTERACTIVE EVIDENCE INSPECTOR -->
+          <div class="inspector-panel">
+            <div class="inspector-card">
+              
+              <div class="inspector-header">
+                <span class="inspector-badge" id="insp-badge">&#128247; PHOTO EVIDENCE</span>
+                <h3 class="inspector-title" id="insp-title">OBJ_01: Damaged Entry Door</h3>
+                <span class="inspector-coords" id="insp-coords">Coordinates: [80, 60, 220, 410]</span>
+              </div>
+
+              <div class="inspector-viewport" id="insp-viewport">
+                <!-- Dynamic SVG Canvas showing highlighted evidence item -->
+                <svg viewBox="0 0 500 320" class="inspector-svg" id="insp-svg">
+                  <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+                  <rect x="40" y="30" width="420" height="260" fill="none" stroke="#334155" stroke-dasharray="6 3"/>
+                  
+                  <!-- Door Highlighted -->
+                  <g id="svg-elem-door">
+                    <rect x="70" y="45" width="110" height="230" fill="rgba(2, 132, 199, 0.25)" stroke="#38bdf8" stroke-width="3" rx="4"/>
+                    <rect x="70" y="45" width="140" height="24" fill="#0284c7" rx="3"/>
+                    <text x="78" y="61" fill="#ffffff" font-size="11" font-weight="bold" font-family="JetBrains Mono">OBJ_01: Door</text>
                   </g>
 
-                  <!-- Bounding Box 2: Knife -->
-                  <g class="bbox-overlay" id="box-IMG_001_OBJ_02" onclick="window.selectEvidenceItem('IMG_001_OBJ_02')">
-                    <rect class="bbox-rect bbox-knife" x="320" y="320" width="120" height="80" rx="3"/>
-                    <rect class="bbox-tag-bg bbox-knife-tag" x="320" y="320" width="150" height="22" rx="3"/>
-                    <text class="bbox-tag-text" x="328" y="335">OBJ_02: Knife / Blade</text>
+                  <!-- Knife -->
+                  <g id="svg-elem-knife" opacity="0.3">
+                    <rect x="220" y="200" width="80" height="40" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" stroke-width="2" rx="3"/>
+                    <text x="226" y="224" fill="#22d3ee" font-size="10" font-family="JetBrains Mono">OBJ_02</text>
                   </g>
 
-                  <!-- Bounding Box 3: Red stain -->
-                  <g class="bbox-overlay" id="box-IMG_001_OBJ_03" onclick="window.selectEvidenceItem('IMG_001_OBJ_03')">
-                    <rect class="bbox-rect bbox-stain" x="440" y="340" width="100" height="90" rx="3"/>
-                    <rect class="bbox-tag-bg bbox-stain-tag" x="440" y="340" width="185" height="22" rx="3"/>
-                    <text class="bbox-tag-text" x="448" y="355">OBJ_03: Red Stain (Unverified)</text>
-                  </g>
-
-                  <!-- Bounding Box 4: Telephone -->
-                  <g class="bbox-overlay" id="box-IMG_001_OBJ_04" onclick="window.selectEvidenceItem('IMG_001_OBJ_04')">
-                    <rect class="bbox-rect bbox-phone" x="570" y="180" width="130" height="100" rx="3"/>
-                    <rect class="bbox-tag-bg bbox-phone-tag" x="570" y="180" width="195" height="22" rx="3"/>
-                    <text class="bbox-tag-text" x="578" y="195">OBJ_04: Dislodged Phone</text>
+                  <!-- Stain -->
+                  <g id="svg-elem-stain" opacity="0.3">
+                    <circle cx="350" cy="220" r="30" fill="rgba(220, 38, 38, 0.2)" stroke="#dc2626" stroke-width="2" stroke-dasharray="3 3"/>
+                    <text x="335" y="225" fill="#f87171" font-size="10" font-family="JetBrains Mono">OBJ_03</text>
                   </g>
                 </svg>
-
-                <div class="canvas-info-bar">
-                  <div class="info-pill"><span class="status-dot green"></span> Florence-2 Grounding Active</div>
-                  <div class="info-dim">4/4 Objects Mapped (Threshold: 0.65)</div>
-                </div>
               </div>
 
-              <!-- Candidate Items Container -->
-              <div class="extracted-items-container">
-                <div class="section-title-row">
-                  <h4>Florence-2 Localized Candidates</h4>
-                  <span class="badge-subtle">4 DETECTIONS</span>
+              <div class="inspector-details">
+                <div class="insp-stat-row">
+                  <span class="insp-label">Grounding Source:</span>
+                  <span class="insp-val" id="insp-source">Microsoft Florence-2-base (Dense Caption)</span>
                 </div>
-                <div class="items-grid">
-                  <div class="evidence-item-card" id="card-IMG_001_OBJ_01" onclick="window.selectEvidenceItem('IMG_001_OBJ_01')">
-                    <div class="item-header">
-                      <span class="evidence-id-tag">IMG_001_OBJ_01</span>
-                      <span class="confidence-pill high">91.4%</span>
-                    </div>
-                    <div class="item-title">Damaged Entry Door Frame</div>
-                    <div class="item-coords">Coords: [80, 60, 220, 410]</div>
-                    <div class="item-status">Latch fractured, external force marks</div>
-                  </div>
-
-                  <div class="evidence-item-card" id="card-IMG_001_OBJ_02" onclick="window.selectEvidenceItem('IMG_001_OBJ_02')">
-                    <div class="item-header">
-                      <span class="evidence-id-tag">IMG_001_OBJ_02</span>
-                      <span class="confidence-pill high">87.2%</span>
-                    </div>
-                    <div class="item-title">Metallic Knife / Blade</div>
-                    <div class="item-coords">Coords: [320, 320, 440, 400]</div>
-                    <div class="item-status">Kitchen blade, floor position</div>
-                  </div>
-
-                  <div class="evidence-item-card" id="card-IMG_001_OBJ_03" onclick="window.selectEvidenceItem('IMG_001_OBJ_03')">
-                    <div class="item-header">
-                      <span class="evidence-id-tag">IMG_001_OBJ_03</span>
-                      <span class="confidence-pill med">82.0%</span>
-                    </div>
-                    <div class="item-title">Red Liquid / Stain</div>
-                    <div class="item-coords">Coords: [440, 340, 540, 430]</div>
-                    <div class="item-status">Visual only; biological origin unverified</div>
-                  </div>
-
-                  <div class="evidence-item-card" id="card-IMG_001_OBJ_04" onclick="window.selectEvidenceItem('IMG_001_OBJ_04')">
-                    <div class="item-header">
-                      <span class="evidence-id-tag">IMG_001_OBJ_04</span>
-                      <span class="confidence-pill med">78.5%</span>
-                    </div>
-                    <div class="item-title">Dislodged Telephone</div>
-                    <div class="item-coords">Coords: [570, 180, 700, 280]</div>
-                    <div class="item-status">Overturned, physical struggle indicator</div>
-                  </div>
+                <div class="insp-stat-row">
+                  <span class="insp-label">Validation Status:</span>
+                  <span class="insp-val green-text" id="insp-status">&#10004; Verified &amp; Mapped to Evidence Set</span>
                 </div>
-              </div>
-            </div>
-
-            <!-- ===== VIDEO MODALITY ===== -->
-            <div class="modality-content" id="modality-video" style="display: none;">
-              <div class="video-preview-box">
-                <div class="video-mock-screen">
-                  <div class="cctv-header-stamp">&#9679; REC &#8212; CAM-04 (HALLWAY B) &#8212; 2026-10-04 21:18:42 EST</div>
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="3" width="15" height="14" rx="2" ry="2"/></svg>
-                  <div class="video-time-overlay" id="vid-time-display">00:00:24.000</div>
-                </div>
-
-                <!-- Video Timeline Scrubber -->
-                <div class="video-scrubber-container">
-                  <div class="scrubber-track" id="video-track" onclick="window.seekVideoTimeline(event)">
-                    <div class="scrubber-progress" id="video-progress" style="width: 15%;"></div>
-                    <div class="event-pin" style="left: 48%;" onclick="event.stopPropagation(); window.seekExactTime('00:01:23', 48);" title="00:01:23 Figure detected"></div>
-                    <div class="event-pin" style="left: 72%;" onclick="event.stopPropagation(); window.seekExactTime('00:02:08', 72);" title="00:02:08 Door displacement"></div>
-                  </div>
-                  <div class="scrubber-labels">
-                    <span>00:00:00</span>
-                    <span class="active-ts-label" id="active-video-ts">Current: 00:00:24</span>
-                    <span>00:03:00</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Keyframe Filmstrip -->
-              <div class="keyframe-ribbon-section">
-                <h4>Extracted Keyframes (Scene-Change Detection)</h4>
-                <div class="keyframe-filmstrip">
-                  <div class="keyframe-thumbnail active-kf" id="kf-1" onclick="window.seekExactTime('00:00:24', 15)">
-                    <div class="kf-badge active-badge">KF-01 &#8212; 00:00:24</div>
-                    <div class="kf-mock">Static Corridor</div>
-                    <div class="kf-meta">Confidence: 0.94</div>
-                  </div>
-                  <div class="keyframe-thumbnail" id="kf-2" onclick="window.seekExactTime('00:01:23', 48)">
-                    <div class="kf-badge">KF-02 &#8212; 00:01:23</div>
-                    <div class="kf-mock">Figure Near 4B</div>
-                    <div class="kf-meta">Confidence: 0.88</div>
-                  </div>
-                  <div class="keyframe-thumbnail" id="kf-3" onclick="window.seekExactTime('00:02:08', 72)">
-                    <div class="kf-badge">KF-03 &#8212; 00:02:08</div>
-                    <div class="kf-mock">Door Displacement</div>
-                    <div class="kf-meta">Confidence: 0.91</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ===== AUDIO MODALITY ===== -->
-            <div class="modality-content" id="modality-audio" style="display: none;">
-              <div class="audio-console">
-                <div class="waveform-box">
-                  <div class="waveform-bars">
-                    <span style="height: 20px;"></span><span style="height: 35px;"></span><span style="height: 52px;"></span>
-                    <span style="height: 40px;"></span><span style="height: 58px;"></span><span style="height: 30px;"></span>
-                    <span style="height: 48px;"></span><span style="height: 60px;"></span><span style="height: 25px;"></span>
-                    <span style="height: 42px;"></span><span style="height: 55px;"></span><span style="height: 38px;"></span>
-                    <span style="height: 50px;"></span><span style="height: 22px;"></span><span style="height: 45px;"></span>
-                    <span style="height: 58px;"></span><span style="height: 32px;"></span><span style="height: 20px;"></span>
-                  </div>
-                  <div class="waveform-meta">
-                    <span>911 Dispatch Intake &#8282; AUD_001.wav</span>
-                    <span>Duration: 00:32.40</span>
-                    <span>Whisper ASR: Synced</span>
-                  </div>
-                </div>
-
-                <div class="transcript-timeline">
-                  <h4>Whisper-base Timestamped Segments</h4>
-                  <div class="dialogue-list">
-                    <div class="dialogue-card" id="aud-seg-1" onclick="window.highlightCitation('audio', '00:02.10')">
-                      <div class="item-header">
-                        <div>
-                          <span class="ts-pill">00:02.10 &#8211; 00:08.50</span>
-                          <span class="speaker-tag">CALLER</span>
-                        </div>
-                      </div>
-                      <p class="dialogue-text">"There's someone — I think someone broke into the apartment next door, 4B. I heard loud banging and something shattered."</p>
-                    </div>
-
-                    <div class="dialogue-card" id="aud-seg-2" onclick="window.highlightCitation('audio', '00:14.20')">
-                      <div class="item-header">
-                        <div>
-                          <span class="ts-pill active-ts-pill">00:14.20 &#8211; 00:17.80</span>
-                          <span class="speaker-tag">CALLER</span>
-                        </div>
-                      </div>
-                      <p class="dialogue-text">"It sounded like the door just got kicked in — wood cracking, loud impact."</p>
-                    </div>
-
-                    <div class="dialogue-card" id="aud-seg-3" onclick="window.highlightCitation('audio', '00:22.00')">
-                      <div class="item-header">
-                        <div>
-                          <span class="ts-pill">00:22.00 &#8211; 00:30.10</span>
-                          <span class="speaker-tag">DISPATCH</span>
-                        </div>
-                      </div>
-                      <p class="dialogue-text">"Copy that. Units are being dispatched to your location. Stay on the line and remain in your apartment."</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- RIGHT COLUMN: GENERATED GROUNDED REPORT ASSESSMENT -->
-          <div class="card report-card">
-            
-            <div class="report-header-banner">
-              <div>
-                <span class="prelim-badge">PRELIMINARY FORENSIC INTELLIGENCE REPORT</span>
-                <h3 class="report-title">#CASE-2026-084B &#8212; Entryway Disturbance</h3>
-                <span class="report-sub">Deterministic Validation: 100% Citing Valid Evidence IDs</span>
-              </div>
-              <div class="validation-shield">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                <div>
-                  <span class="shield-title">GROUNDED IN EVIDENCE</span>
-                  <span class="shield-sub">0 Hallucinations Detected</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Report Filter Chips -->
-            <div class="report-filter-bar">
-              <button class="filter-chip active" data-cat="all" onclick="window.filterReport('all')">All Claims (7)</button>
-              <button class="filter-chip" data-cat="observation" onclick="window.filterReport('observation')">Observations (4)</button>
-              <button class="filter-chip" data-cat="inference" onclick="window.filterReport('inference')">Cautious Inferences (2)</button>
-              <button class="filter-chip" data-cat="unverified" onclick="window.filterReport('unverified')">Unverified Lab Tests (1)</button>
-            </div>
-
-            <!-- Report Document Body -->
-            <div class="report-document">
-
-              <!-- Case Dossier Section -->
-              <div class="report-sec" data-category="all">
-                <div class="sec-heading">1. Case Dossier &amp; Metadata</div>
-                <div class="sec-intro">Autonomous multimodal extraction pipeline verified by local deterministic validator.</div>
-                <div class="meta-grid">
-                  <div class="meta-box"><span class="meta-k">CASE ID</span><span class="meta-v">#CASE-2026-084B</span></div>
-                  <div class="meta-box"><span class="meta-k">INCIDENT TYPE</span><span class="meta-v">Forced Entry Investigation</span></div>
-                  <div class="meta-box"><span class="meta-k">LOCATION</span><span class="meta-v">Apt 4B, 1240 Meridian Pkwy</span></div>
-                  <div class="meta-box"><span class="meta-k">EVIDENCE GROUNDING</span><span class="meta-v" style="color:var(--color-success);">100% (7 of 7 claims cited)</span></div>
-                </div>
-              </div>
-
-              <!-- Direct Observations -->
-              <div class="report-sec" data-category="observation">
-                <div class="sec-heading">2. Direct Observations (Florence-2 / Whisper / CCTV)</div>
-                
-                <div class="finding-card">
-                  <span class="finding-type-pill">DIRECT OBSERVATION</span>
-                  <p class="finding-text">
-                    Entry door to Apartment 4B exhibits visible structural compromise including latch displacement and frame splintering consistent with applied external force.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill" onclick="window.highlightCitation('image', 'IMG_001_OBJ_01')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                      IMG_001_OBJ_01 [x:80, y:60]
-                    </span>
-                  </div>
-                </div>
-
-                <div class="finding-card">
-                  <span class="finding-type-pill">DIRECT OBSERVATION</span>
-                  <p class="finding-text">
-                    A metallic blade instrument was detected on the floor surface at interior position proximate to center room.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill" onclick="window.highlightCitation('image', 'IMG_001_OBJ_02')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                      IMG_001_OBJ_02 [x:320, y:320]
-                    </span>
-                  </div>
-                </div>
-
-                <div class="finding-card">
-                  <span class="finding-type-pill">DIRECT OBSERVATION</span>
-                  <p class="finding-text">
-                    Hallway surveillance records an unidentified figure positioned immediately outside Apartment 4B vicinity.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill video-pill" onclick="window.highlightCitation('video', '00:01:23')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/></svg>
-                      VID_001 @ 00:01:23 [Frame #2490]
-                    </span>
-                  </div>
-                </div>
-
-                <div class="finding-card">
-                  <span class="finding-type-pill">DIRECT OBSERVATION</span>
-                  <p class="finding-text">
-                    Audio recording captures caller stating audible impact followed by wood fracturing sound.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill audio-pill" onclick="window.highlightCitation('audio', '00:14.20')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8"/></svg>
-                      AUD_001 @ 00:14.20&#8211;00:17.80
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Cautious Inferences -->
-              <div class="report-sec" data-category="inference">
-                <div class="sec-heading">3. Cautious Cross-Modal Temporal Inferences</div>
-                
-                <div class="finding-card inference">
-                  <span class="finding-type-pill inference-pill">CAUTIOUS INFERENCE &#8282; TEMPORAL MATCH</span>
-                  <p class="finding-text">
-                    Physical displacement of the entry door visible in CCTV correlates temporally with caller's distress report of wood recoil.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill video-pill" onclick="window.highlightCitation('video', '00:02:08')">VID_001 @ 00:02:08</span>
-                    <span class="cite-pill audio-pill" onclick="window.highlightCitation('audio', '00:14.20')">AUD_001 @ 00:14.20</span>
-                  </div>
-                </div>
-
-                <div class="finding-card inference">
-                  <span class="finding-type-pill inference-pill">CAUTIOUS INFERENCE</span>
-                  <p class="finding-text">
-                    Overturned furniture and dislodged telephone device suggest rapid physical struggle or hurried departure.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill" onclick="window.highlightCitation('image', 'IMG_001_OBJ_04')">IMG_001_OBJ_04</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Unverified Lab Checks -->
-              <div class="report-sec" data-category="unverified">
-                <div class="sec-heading">4. Required Physical Forensic Laboratory Examinations</div>
-                <div class="finding-card unverified">
-                  <span class="finding-type-pill unverified-pill">UNVERIFIED &#8282; LAB ACTION MANDATED</span>
-                  <p class="finding-text">
-                    Red liquid pooling adjacent to the knife blade cannot be determined as biological blood from visual pixels alone. Serology and DNA typing required.
-                  </p>
-                  <div class="citation-row">
-                    <span class="cite-pill" onclick="window.highlightCitation('image', 'IMG_001_OBJ_03')">
-                      IMG_001_OBJ_03 [Stain]
-                    </span>
-                    <span class="status-action-tag">ACTION: Serology &amp; Hemascein Swab Required</span>
-                  </div>
+                <div class="insp-stat-row">
+                  <span class="insp-label">Investigator Action:</span>
+                  <span class="insp-val" id="insp-action">Preserve splinter patterns for toolmark examination</span>
                 </div>
               </div>
 
             </div>
-
-            <!-- Report Actions Footer -->
-            <div class="report-footer-actions">
-              <button class="btn-outline-sm" onclick="alert('Deterministic Validation Result: PASSED.\nAll 7 cited evidence_ids exist in the validated evidence schema.');">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Re-verify Citations
-              </button>
-              <button class="btn-primary-sm" onclick="window.printReport()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                Print Preliminary Report
-              </button>
-            </div>
-
           </div>
 
         </div>
-      </section>
 
-
-      <!-- PAGE 4: SYSTEM & HARDWARE -->
-      <section id="page-settings" class="view-panel" style="display: none;">
-        <div class="diagnostics-layout">
-          <div class="diag-header">
-            <div>
-              <h1 class="page-title">Hardware Diagnostics &amp; VRAM Monitor</h1>
-              <p class="page-subtitle">BENCHMARKED FOR NVIDIA RTX 4050 LAPTOP GPU (6 GB VRAM) &#8282; SEQUENTIAL DEPLOYMENT</p>
-            </div>
-            <button class="btn-secondary" onclick="window.purgeGPUCache()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              Purge GPU Cache (empty_cache)
-            </button>
-          </div>
-
-          <div class="gauges-grid">
-            <div class="gauge-card">
-              <div class="gauge-title-row">
-                <span class="gauge-name">NVIDIA RTX 4050 VRAM</span>
-                <span class="gauge-val" id="vram-val-text">1.42 GB / 6.00 GB</span>
-              </div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar-fill green-fill" id="vram-bar" style="width: 23.6%;"></div>
-              </div>
-              <div class="gauge-footer">
-                <span>Current Peak: 1.42 GB</span>
-                <span class="safe-badge">SAFE (23.6% LOAD)</span>
-              </div>
-            </div>
-
-            <div class="gauge-card">
-              <div class="gauge-title-row">
-                <span class="gauge-name">System RAM (DDR5)</span>
-                <span class="gauge-val">5.80 GB / 16.00 GB</span>
-              </div>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar-fill blue-fill" style="width: 36.2%;"></div>
-              </div>
-              <div class="gauge-footer">
-                <span>Available: 10.20 GB</span>
-                <span class="safe-badge">OPTIMAL</span>
-              </div>
-            </div>
-          </div>
-
-          <h3 class="diag-section-title">Sequential Pipeline Model States</h3>
-          <div class="model-cards-grid">
-            <div class="model-card active-model">
-              <div class="model-header">
-                <span class="stage-tag">STAGE 1 &#8282; VISION</span>
-                <span class="model-status-pill green">LOADED &amp; ACTIVE</span>
-              </div>
-              <h4>Microsoft Florence-2-base</h4>
-              <p class="model-desc">Vision-language model for dense region captioning, OCR, and coordinate bounding-box grounding.</p>
-              <div class="model-meta-row">
-                <span>Footprint: ~1.18 GB VRAM</span>
-                <span>Invoked per image/frame</span>
-              </div>
-            </div>
-
-
-            <div class="model-card">
-              <div class="model-header">
-                <span class="stage-tag">STAGE 2 &#8282; SPEECH ASR</span>
-                <span class="model-status-pill gray">UNLOADED (STANDBY)</span>
-              </div>
-              <h4>OpenAI Whisper-base</h4>
-              <p class="model-desc">Automated speech-to-text with timestamped speech segments. Loaded only during audio intake.</p>
-              <div class="model-meta-row">
-                <span>Footprint: ~0.85 GB VRAM</span>
-                <span>PyTorch Cache: Cleared</span>
-              </div>
-            </div>
-
-
-            <div class="model-card">
-              <div class="model-header">
-                <span class="stage-tag">STAGE 3 &#8282; SYNTHESIS</span>
-                <span class="model-status-pill gray">UNLOADED (STANDBY)</span>
-              </div>
-              <h4>Ollama (Llama-3.2-3B)</h4>
-              <p class="model-desc">Local quantized text synthesizer formatting structured claims. Unloads immediately after execution.</p>
-              <div class="model-meta-row">
-                <span>Footprint: ~2.10 GB VRAM</span>
-                <span>Status: keep_alive=0</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="principles-banner">
-            <h4>EMTRIA Forensic Non-Negotiables &amp; Ethics Guardrails</h4>
-            <ul>
-              <li><strong>Zero Uncited Speculation:</strong> Every declarative finding MUST map directly to an extracted, timestamped, or coordinate-grounded evidence item.</li>
-              <li><strong>Strict Epistemic Segregation:</strong> Direct observations, cautious inferences, and unverified lab checks are isolated into distinct schema categories.</li>
-              <li><strong>Deterministic Gatekeeping:</strong> A rule-based AST validator rejects any report with uncited entities before presentation to an examiner.</li>
-              <li><strong>100% Local Confidentiality:</strong> All models run fully offline on edge hardware (RTX 4050 6GB) under sequential VRAM cache management.</li>
-            </ul>
-          </div>
-        </div>
       </section>
 
     </main>
+
   </div>
 
   <script src="app.js"></script>

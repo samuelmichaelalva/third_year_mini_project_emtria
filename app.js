@@ -1,12 +1,12 @@
 /**
- * EMTRIA FORENSIC INTELLIGENCE — INTERACTIVE CORE CONTROLLER
- * Evidence-grounded Multimodal Traceable Reporting Architecture
+ * EMTRIA FORENSIC INTELLIGENCE — INTERACTIVE CONTROLLER
+ * Simple, Clean 3-Step Guided Wizard Workflow
  */
 
 (function () {
   'use strict';
 
-  // --- THEME MANAGEMENT (Default Light Mode) ---
+  // --- THEME MANAGEMENT ---
   const htmlEl = document.documentElement;
   const themeToggleBtn = document.getElementById('theme-toggle');
 
@@ -22,219 +22,255 @@
     });
   }
 
-  // --- PAGE NAVIGATION ---
-  window.navigateTo = function (pageId) {
-    document.querySelectorAll('.view-panel').forEach(panel => {
-      panel.style.display = 'none';
-      panel.classList.remove('active-panel');
+  // --- WIZARD STEP NAVIGATION ---
+  window.goToStep = function (stepNum) {
+    // Hide all step views
+    document.querySelectorAll('.step-view').forEach(view => {
+      view.classList.remove('active');
     });
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.classList.remove('active');
-    });
-
-    const targetPanel = document.getElementById('page-' + pageId);
-    const targetNav = document.getElementById('nav-' + pageId);
-
-    if (targetPanel) {
-      targetPanel.style.display = 'block';
-      targetPanel.classList.add('active-panel');
+    // Show target step view
+    const targetView = document.getElementById('wizard-step-' + stepNum);
+    if (targetView) {
+      targetView.classList.add('active');
     }
 
-    if (targetNav) {
-      targetNav.classList.add('active');
+    // Update Stepper Buttons & Connectors
+    for (let i = 1; i <= 3; i++) {
+      const btn = document.getElementById('step-btn-' + i);
+      if (btn) {
+        btn.classList.remove('active', 'completed');
+        if (i < stepNum) {
+          btn.classList.add('completed');
+        } else if (i === stepNum) {
+          btn.classList.add('active');
+        }
+      }
     }
+
+    const conn1 = document.getElementById('connector-1');
+    const conn2 = document.getElementById('connector-2');
+    if (conn1) conn1.classList.toggle('completed', stepNum > 1);
+    if (conn2) conn2.classList.toggle('completed', stepNum > 2);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- MODALITY TAB SWITCHING ---
-  window.switchModality = function (modality) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.modality-content').forEach(content => {
-      content.style.display = 'none';
-      content.classList.remove('active-modality');
+  // --- STEP 1: SELECT EVIDENCE CARD ---
+  window.selectEvidenceTab = function (type) {
+    document.querySelectorAll('.evidence-box').forEach(box => {
+      box.classList.remove('active-evidence');
     });
-
-    const activeBtn = document.getElementById('tab-' + modality);
-    const activeContent = document.getElementById('modality-' + modality);
-
-    if (activeBtn) activeBtn.classList.add('active');
-    if (activeContent) {
-      activeContent.style.display = 'block';
-      activeContent.classList.add('active-modality');
+    const selected = document.getElementById('ev-card-' + type);
+    if (selected) {
+      selected.classList.add('active-evidence');
     }
   };
 
-  // --- INTERACTIVE EVIDENCE GROUNDING & CITATION HIGHLIGHTING ---
-  window.highlightCitation = function (type, targetId) {
-    if (type === 'image') {
-      window.switchModality('image');
+  // --- STEP 2: RUN PROCESSING SIMULATION ---
+  window.startProcessing = function () {
+    window.goToStep(2);
 
-      // Highlight SVG Bounding Box
-      document.querySelectorAll('.bbox-overlay').forEach(b => b.classList.remove('active-highlight'));
-      const targetBBox = document.getElementById('box-' + targetId);
-      if (targetBBox) {
-        targetBBox.classList.add('active-highlight');
-      }
+    // Progressive step simulation
+    const steps = [
+      { id: 'pstep-1', delay: 400 },
+      { id: 'pstep-2', delay: 800 },
+      { id: 'pstep-3', delay: 1200 },
+      { id: 'pstep-4', delay: 1600 }
+    ];
 
-      // Highlight Candidate Card
-      document.querySelectorAll('.evidence-item-card').forEach(c => c.classList.remove('active-card'));
-      const targetCard = document.getElementById('card-' + targetId);
-      if (targetCard) {
-        targetCard.classList.add('active-card');
-        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-    } else if (type === 'video') {
-      window.switchModality('video');
-      if (targetId === '00:01:23') {
-        window.seekExactTime('00:01:23', 48);
-      } else if (targetId === '00:02:08') {
-        window.seekExactTime('00:02:08', 72);
-      } else {
-        window.seekExactTime('00:00:24', 15);
-      }
-
-    } else if (type === 'audio') {
-      window.switchModality('audio');
-      document.querySelectorAll('.dialogue-card').forEach(d => d.classList.remove('active-audio-card'));
-      const seg = document.getElementById('aud-seg-2');
-      if (seg) {
-        seg.classList.add('active-audio-card');
-        seg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
-  };
-
-  // --- SELECT EVIDENCE ITEM FROM CANVAS / LIST ---
-  window.selectEvidenceItem = function (evidenceId) {
-    document.querySelectorAll('.bbox-overlay').forEach(b => b.classList.remove('active-highlight'));
-    document.querySelectorAll('.evidence-item-card').forEach(c => c.classList.remove('active-card'));
-
-    const bbox = document.getElementById('box-' + evidenceId);
-    if (bbox) bbox.classList.add('active-highlight');
-
-    const card = document.getElementById('card-' + evidenceId);
-    if (card) {
-      card.classList.add('active-card');
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  };
-
-  // --- TOGGLE BOUNDING BOXES ON/OFF ---
-  window.toggleBoundingBoxes = function (isChecked) {
-    const overlays = document.querySelectorAll('.bbox-overlay');
-    overlays.forEach(overlay => {
-      overlay.style.display = isChecked ? 'block' : 'none';
-    });
-  };
-
-  // --- VIDEO SCRUBBER SEEKING ---
-  window.seekExactTime = function (timestampStr, pct) {
-    const progress = document.getElementById('video-progress');
-    const display = document.getElementById('vid-time-display');
-    const activeLabel = document.getElementById('active-video-ts');
-
-    if (progress) progress.style.width = pct + '%';
-    if (display) display.textContent = timestampStr + '.000';
-    if (activeLabel) activeLabel.textContent = 'Current: ' + timestampStr;
-
-    document.querySelectorAll('.keyframe-thumbnail').forEach(kf => kf.classList.remove('active-kf'));
-    if (pct < 30) {
-      const kf = document.getElementById('kf-1');
-      if (kf) kf.classList.add('active-kf');
-    } else if (pct < 60) {
-      const kf = document.getElementById('kf-2');
-      if (kf) kf.classList.add('active-kf');
-    } else {
-      const kf = document.getElementById('kf-3');
-      if (kf) kf.classList.add('active-kf');
-    }
-  };
-
-  window.seekVideoTimeline = function (e) {
-    const track = document.getElementById('video-track');
-    if (!track) return;
-    const rect = track.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const pct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
-
-    const totalSeconds = 180;
-    const currentSec = Math.floor((pct / 100) * totalSeconds);
-    const mm = String(Math.floor(currentSec / 60)).padStart(2, '0');
-    const ss = String(currentSec % 60).padStart(2, '0');
-
-    window.seekExactTime(`${mm}:${ss}`, pct);
-  };
-
-  // --- REPORT FILTERING ---
-  window.filterReport = function (category) {
-    document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
-    const activeChip = Array.from(document.querySelectorAll('.filter-chip')).find(
-      c => c.getAttribute('data-cat') === category
-    );
-    if (activeChip) activeChip.classList.add('active');
-
-    const sections = document.querySelectorAll('.report-sec');
-    sections.forEach(sec => {
-      const secCat = sec.getAttribute('data-category');
-      if (category === 'all' || !secCat) {
-        sec.style.display = 'flex';
-      } else if (secCat === category) {
-        sec.style.display = 'flex';
-      } else {
-        sec.style.display = 'none';
-      }
-    });
-  };
-
-  // --- GPU CACHE PURGE SIMULATION (For Academic Defense) ---
-  window.purgeGPUCache = function () {
-    const vramBar = document.getElementById('vram-bar');
-    const vramText = document.getElementById('vram-val-text');
-
-    if (vramBar && vramText) {
-      vramBar.style.width = '5.8%';
-      vramText.textContent = '0.35 GB / 6.00 GB';
-      vramBar.style.backgroundColor = '#10b981';
-
+    steps.forEach(({ id, delay }) => {
       setTimeout(() => {
-        alert('PyTorch GPU VRAM Cache Purged Successfully (torch.cuda.empty_cache).\nVRAM Reset to Base Footprint: 0.35 GB.');
-        vramBar.style.width = '23.6%';
-        vramText.textContent = '1.42 GB / 6.00 GB';
-      }, 600);
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.opacity = '1';
+        }
+      }, delay);
+    });
+  };
+
+  // --- STEP 3: INTERACTIVE EVIDENCE INSPECTOR ---
+  const evidenceDetailsData = {
+    door: {
+      badge: '📸 PHOTO EVIDENCE',
+      title: 'OBJ_01: Damaged Entry Door',
+      coords: 'Coordinates: [x:80, y:60, w:140, h:350]',
+      source: 'Microsoft Florence-2-base (Dense Caption)',
+      status: '✔ Verified & Mapped to Evidence Set',
+      action: 'Preserve frame latch fragments for mechanical toolmark comparison',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <rect x="40" y="30" width="420" height="260" fill="none" stroke="#334155" stroke-dasharray="6 3"/>
+        <rect x="70" y="45" width="110" height="230" fill="rgba(2, 132, 199, 0.25)" stroke="#38bdf8" stroke-width="3" rx="4"/>
+        <rect x="70" y="45" width="140" height="24" fill="#0284c7" rx="3"/>
+        <text x="78" y="61" fill="#ffffff" font-size="11" font-weight="bold" font-family="JetBrains Mono">OBJ_01: Door</text>
+        <rect x="220" y="200" width="80" height="40" fill="none" stroke="#334155" stroke-width="1" rx="3" opacity="0.3"/>
+        <circle cx="350" cy="220" r="25" fill="none" stroke="#334155" stroke-width="1" opacity="0.3"/>
+      `
+    },
+    knife: {
+      badge: '📸 PHOTO EVIDENCE',
+      title: 'OBJ_02: Metallic Knife / Blade',
+      coords: 'Coordinates: [x:320, y:320, w:120, h:80]',
+      source: 'Microsoft Florence-2-base (Object Detection)',
+      status: '✔ Verified & Mapped to Evidence Set',
+      action: 'Recover weapon for latent fingerprint analysis and DNA swab',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <rect x="40" y="30" width="420" height="260" fill="none" stroke="#334155" stroke-dasharray="6 3"/>
+        <rect x="70" y="45" width="110" height="230" fill="none" stroke="#334155" stroke-width="1" opacity="0.3"/>
+        <rect x="180" y="160" width="140" height="70" fill="rgba(6, 182, 212, 0.25)" stroke="#22d3ee" stroke-width="3" rx="4"/>
+        <rect x="180" y="160" width="130" height="24" fill="#0891b2" rx="3"/>
+        <text x="188" y="176" fill="#ffffff" font-size="11" font-weight="bold" font-family="JetBrains Mono">OBJ_02: Knife</text>
+        <circle cx="370" cy="210" r="25" fill="none" stroke="#334155" stroke-width="1" opacity="0.3"/>
+      `
+    },
+    cctv: {
+      badge: '📹 CCTV FOOTAGE',
+      title: 'VID_001: Figure Outside 4B',
+      coords: 'Timestamp: 00:01:23.000 [Hallway Cam 04]',
+      source: 'OpenCV Frame Sampler + Florence-2',
+      status: '✔ Verified & Correlated to Timeline',
+      action: 'Request extended building perimeter cameras for exterior egress path',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#080c14" rx="6"/>
+        <text x="25" y="35" fill="#10b981" font-size="11" font-family="JetBrains Mono">&#9679; CAM-04 REPLAY @ 00:01:23.000</text>
+        <rect x="160" y="70" width="180" height="200" fill="rgba(139, 92, 246, 0.15)" stroke="#a78bfa" stroke-width="2" rx="6"/>
+        <circle cx="250" cy="120" r="25" fill="rgba(139, 92, 246, 0.3)" stroke="#a78bfa" stroke-width="2"/>
+        <path d="M 215 220 C 215 165, 285 165, 285 220 Z" fill="rgba(139, 92, 246, 0.3)" stroke="#a78bfa" stroke-width="2"/>
+        <rect x="160" y="70" width="160" height="22" fill="#7c3aed" rx="3"/>
+        <text x="168" y="85" fill="#ffffff" font-size="10" font-weight="bold" font-family="JetBrains Mono">FIGURE DETECTED</text>
+      `
+    },
+    audio: {
+      badge: '🎙️ DISPATCH AUDIO',
+      title: 'AUD_001: 911 Caller Wood Fracture Sound',
+      coords: 'Segment: 00:14.20 – 00:17.80 [Speaker: CALLER]',
+      source: 'OpenAI Whisper-base (ASR Timestamped)',
+      status: '✔ Verified & Audio-Text Aligned',
+      action: 'Preserve uncompressed 911 dispatch telephony recording for acoustic forensics',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <text x="25" y="35" fill="#f59e0b" font-size="11" font-family="JetBrains Mono">&#9679; AUD_001.wav &#8282; Segment 2 of 3 (00:14.20)</text>
+        <g transform="translate(40, 100)">
+          <rect x="0" y="30" width="16" height="40" fill="#f59e0b" rx="2"/>
+          <rect x="25" y="10" width="16" height="80" fill="#f59e0b" rx="2"/>
+          <rect x="50" y="0" width="16" height="100" fill="#f59e0b" rx="2"/>
+          <rect x="75" y="20" width="16" height="60" fill="#f59e0b" rx="2"/>
+          <rect x="100" y="5" width="16" height="90" fill="#f59e0b" rx="2"/>
+          <rect x="125" y="25" width="16" height="50" fill="#f59e0b" rx="2"/>
+          <rect x="150" y="40" width="16" height="20" fill="#f59e0b" rx="2"/>
+          <rect x="175" y="15" width="16" height="70" fill="#f59e0b" rx="2"/>
+          <rect x="200" y="0" width="16" height="100" fill="#f59e0b" rx="2"/>
+          <rect x="225" y="10" width="16" height="80" fill="#f59e0b" rx="2"/>
+          <rect x="250" y="30" width="16" height="40" fill="#f59e0b" rx="2"/>
+          <rect x="275" y="42" width="16" height="16" fill="#f59e0b" rx="2"/>
+          <rect x="300" y="35" width="16" height="30" fill="#f59e0b" rx="2"/>
+          <rect x="325" y="20" width="16" height="60" fill="#f59e0b" rx="2"/>
+          <rect x="350" y="10" width="16" height="80" fill="#f59e0b" rx="2"/>
+          <rect x="375" y="35" width="16" height="30" fill="#f59e0b" rx="2"/>
+        </g>
+        <text x="35" y="260" fill="#cbd5e1" font-size="12" font-style="italic">"It sounded like the door just got kicked in — wood cracking, loud impact."</text>
+      `
+    },
+    correlation: {
+      badge: '⏱️ TEMPORAL CORRELATION',
+      title: 'Cross-Modal Match: CCTV & 911 Call',
+      coords: 'Correlation Delta: < 2.4s between acoustic bang & door recoil',
+      source: 'Python Temporal Alignment Engine',
+      status: '✔ Temporal Entailment Supported',
+      action: 'Correlate with building electrical access control log timestamp',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <text x="25" y="35" fill="#a78bfa" font-size="11" font-family="JetBrains Mono">&#9679; CROSS-MODAL TEMPORAL ALIGNMENT</text>
+        <line x1="50" y1="120" x2="450" y2="120" stroke="#334155" stroke-width="2"/>
+        <line x1="50" y1="200" x2="450" y2="200" stroke="#334155" stroke-width="2"/>
+        
+        <circle cx="210" cy="120" r="10" fill="#8b5cf6"/>
+        <text x="140" y="100" fill="#a78bfa" font-size="10" font-family="JetBrains Mono">CCTV Door Move: 00:02:08</text>
+        
+        <circle cx="230" cy="200" r="10" fill="#f59e0b"/>
+        <text x="140" y="235" fill="#fbbf24" font-size="10" font-family="JetBrains Mono">911 Audio Impact: 00:14.20</text>
+        
+        <line x1="210" y1="120" x2="230" y2="200" stroke="#34d399" stroke-width="2" stroke-dasharray="4 2"/>
+        <rect x="235" y="150" width="130" height="22" fill="#065f46" rx="3"/>
+        <text x="242" y="165" fill="#6ee7b7" font-size="9" font-weight="bold" font-family="JetBrains Mono">SYNCED (&Delta; ~1.8s)</text>
+      `
+    },
+    phone: {
+      badge: '📸 PHOTO EVIDENCE',
+      title: 'OBJ_04: Dislodged Telephone',
+      coords: 'Coordinates: [x:570, y:180, w:130, h:100]',
+      source: 'Microsoft Florence-2-base (Dense Caption)',
+      status: '✔ Verified & Mapped to Evidence Set',
+      action: 'Check call history and handset for touch DNA transfer',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <rect x="40" y="30" width="420" height="260" fill="none" stroke="#334155" stroke-dasharray="6 3"/>
+        <rect x="70" y="45" width="110" height="230" fill="none" stroke="#334155" stroke-width="1" opacity="0.3"/>
+        <rect x="280" y="110" width="150" height="110" fill="rgba(139, 92, 246, 0.25)" stroke="#a78bfa" stroke-width="3" rx="4"/>
+        <rect x="280" y="110" width="150" height="24" fill="#6d28d9" rx="3"/>
+        <text x="288" y="126" fill="#ffffff" font-size="11" font-weight="bold" font-family="JetBrains Mono">OBJ_04: Phone</text>
+      `
+    },
+    stain: {
+      badge: '🧪 PHYSICAL LAB MANDATE',
+      title: 'OBJ_03: Red Liquid / Stain',
+      coords: 'Coordinates: [x:440, y:340, w:100, h:90]',
+      source: 'Florence-2 Visual Detection ONLY',
+      status: '⚠ UNVERIFIED — Lab Confirmation Required',
+      action: 'MANDATORY: Submit cotton swab for Kastle-Meyer serology & DNA typing',
+      svgMarkup: `
+        <rect width="500" height="320" fill="#0b0f17" rx="6"/>
+        <rect x="40" y="30" width="420" height="260" fill="none" stroke="#334155" stroke-dasharray="6 3"/>
+        <circle cx="260" cy="160" r="55" fill="rgba(220, 38, 38, 0.3)" stroke="#ef4444" stroke-width="3" stroke-dasharray="4 2"/>
+        <rect x="180" y="90" width="160" height="24" fill="#991b1b" rx="3"/>
+        <text x="188" y="106" fill="#ffffff" font-size="10" font-weight="bold" font-family="JetBrains Mono">OBJ_03: Red Stain</text>
+        <rect x="150" y="240" width="220" height="26" fill="#450a0a" stroke="#dc2626" rx="3"/>
+        <text x="160" y="257" fill="#fca5a5" font-size="10" font-weight="bold" font-family="JetBrains Mono">LAB ACTION: Serology Required</text>
+      `
     }
   };
 
-  // --- IMAGE FILE SWITCHER ---
-  window.switchImageFile = function (fileName) {
-    alert(`Loaded evidence file: ${fileName}.jpg\nModality Analyzer: Microsoft Florence-2-base (Dense Caption & Grounding Activated)`);
+  window.showEvidenceDetail = function (key) {
+    const data = evidenceDetailsData[key];
+    if (!data) return;
+
+    // Highlight clicked card
+    document.querySelectorAll('.finding-simple-card').forEach(card => {
+      card.classList.remove('active-card');
+    });
+    if (window.event && window.event.currentTarget) {
+      window.event.currentTarget.classList.add('active-card');
+    }
+
+    // Update inspector view
+    const b = document.getElementById('insp-badge');
+    const t = document.getElementById('insp-title');
+    const c = document.getElementById('insp-coords');
+    const v = document.getElementById('insp-viewport');
+    const s = document.getElementById('insp-source');
+    const st = document.getElementById('insp-status');
+    const a = document.getElementById('insp-action');
+
+    if (b) b.textContent = data.badge;
+    if (t) t.textContent = data.title;
+    if (c) c.textContent = data.coords;
+    if (s) s.textContent = data.source;
+    if (st) {
+      st.textContent = data.status;
+      st.className = key === 'stain' ? 'insp-val' : 'insp-val green-text';
+      if (key === 'stain') st.style.color = '#ef4444';
+      else st.style.color = '';
+    }
+    if (a) a.textContent = data.action;
+
+    if (v) {
+      v.innerHTML = `<svg viewBox="0 0 500 320" class="inspector-svg">${data.svgMarkup}</svg>`;
+    }
   };
 
-  // --- RUN ANALYSIS SIMULATION ---
-  window.runAnalysisSimulation = function () {
-    alert('Running EMTRIA Evidence-Grounded Pipeline:\n[1/3] Florence-2: Extracted 4 localized objects & dense captions\n[2/3] OpenCV & Whisper: Synced 3 video candidate moments & audio transcripts\n[3/3] Deterministic Validation: 100% of claims cited and mapped to evidence IDs.');
-  };
-
-  // --- EXPORT & PRINT REPORT ---
-  window.exportReport = function () {
-    const jsonReport = {
-      case_id: "#CASE-2026-084B",
-      architecture: "EMTRIA v2.1",
-      evidence_grounding_rate: "100%",
-      findings_count: 7,
-      status: "preliminary_verified"
-    };
-    const blob = new Blob([JSON.stringify(jsonReport, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "EMTRIA_Case_2026_084B_Preliminary_Report.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
+  // Print function
   window.printReport = function () {
     window.print();
   };
