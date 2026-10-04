@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EMTRIA — Forensic Evidence Analyzer</title>
+  <link rel="icon" type="image/png" href="logo-icon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +13,10 @@
 
   <!-- NAV -->
   <nav>
-    <div class="brand">🛡️ <strong>EMTRIA</strong></div>
+    <a href="#" class="brand" onclick="go(1); return false;" title="EMTRIA — Evidence-Grounded Multimodal Traceable Reporting & Intelligence Architecture">
+      <img src="logo-dark.png" alt="EMTRIA Logo" class="brand-logo logo-dark">
+      <img src="logo-light.png" alt="EMTRIA Logo" class="brand-logo logo-light">
+    </a>
     <div class="steps">
       <button class="s-btn active" id="sb1" onclick="go(1)">1 Upload</button>
       <span class="line" id="ln1"></span>
@@ -147,6 +151,7 @@
     <section id="step3" class="step">
       <div class="report-head">
         <div>
+          <img src="logo-light.png" alt="EMTRIA" class="print-logo">
           <span class="p-tag green">GROUNDED REPORT</span> <span class="case-id">#CASE-2026-084B</span>
           <h1>Preliminary Forensic Assessment</h1>
           <p class="sub">Apartment 4B Entryway — 100% claims cite valid evidence</p>
