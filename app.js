@@ -137,4 +137,370 @@
       body.innerHTML = `<svg viewBox="0 0 400 200"><rect width="400" height="200" fill="#0b0f17" rx="6"/><rect x="30" y="20" width="340" height="160" fill="none" stroke="#334155" stroke-dasharray="4"/><rect x="60" y="40" width="100" height="120" fill="${d.color}22" stroke="${d.color}" stroke-width="2" rx="4"/><text x="70" y="60" fill="${d.color}" font-size="11" font-weight="bold" font-family="JetBrains Mono">${d.title.split(':')[0]}</text></svg>`;
     }
   };
+
+  // --- Studio-Grade Dynamic Forensic Background Animation System ---
+  const cvs = $('bg-canvas');
+  if (cvs && cvs.getContext) {
+    const ctx = cvs.getContext('2d');
+    let W = 0, H = 0;
+    const resize = () => { W = cvs.width = window.innerWidth; H = cvs.height = window.innerHeight; };
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Preload photorealistic 3D forensic concept artwork
+    const imgDark = new Image(); imgDark.src = 'bg-dark.jpg';
+    const imgLight = new Image(); imgLight.src = 'bg-light.jpg';
+
+    // 14 3D neural brain node clusters mapped to the brain artwork (normalized 1024x576)
+    const brainNodes = [
+      { x: 0.640, y: 0.290 }, { x: 0.690, y: 0.200 }, { x: 0.740, y: 0.145 },
+      { x: 0.810, y: 0.140 }, { x: 0.880, y: 0.180 }, { x: 0.930, y: 0.250 },
+      { x: 0.900, y: 0.330 }, { x: 0.840, y: 0.380 }, { x: 0.770, y: 0.385 },
+      { x: 0.700, y: 0.340 }, { x: 0.750, y: 0.260 }, { x: 0.820, y: 0.245 },
+      { x: 0.860, y: 0.285 }, { x: 0.790, y: 0.315 }
+    ];
+    // Synaptic connections between brain nodes
+    const brainEdges = [
+      [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,0],
+      [1,10],[2,11],[3,11],[4,12],[5,12],[6,13],[7,13],[8,10],[10,11],[11,12],[12,13],[13,10]
+    ];
+
+    // High-resolution digital fingerprint voxel grid (24x30)
+    const fpPattern = [
+      ".......##########.......",
+      ".....##############.....",
+      "...##################...",
+      "..#####..........#####..",
+      ".####..##########..####.",
+      ".###..############..###.",
+      "###..##############..###",
+      "###.####........####.###",
+      "##..###..######..###..##",
+      "##.###..########..###.##",
+      "##.###.###....###.###.##",
+      "##.###.##..##..##.###.##",
+      "##.###.##.####.##.###.##",
+      "##.###.##.####.##.###.##",
+      "##.###.##..##..##.###.##",
+      "##.###.###....###.###.##",
+      "##.###..########..###.##",
+      "##..###..######..###..##",
+      "###.####........####.###",
+      "###..##############..###",
+      ".###..############..###.",
+      ".####..##########..####.",
+      "..#####..........#####..",
+      "...##################...",
+      ".....##############.....",
+      ".......##########......."
+    ];
+
+    let t = 0;
+    function render() {
+      t += 0.016;
+      ctx.clearRect(0, 0, W, H);
+
+      const isDark = document.documentElement.dataset.theme !== 'light';
+      const curImg = isDark ? imgDark : imgLight;
+
+      // Color Palette adapting dynamically to theme
+      const cSky = isDark ? 'rgba(56, 189, 248, ' : 'rgba(2, 132, 199, ';
+      const cGold = isDark ? 'rgba(251, 191, 36, ' : 'rgba(217, 119, 6, ';
+      const cPur = isDark ? 'rgba(167, 139, 250, ' : 'rgba(139, 92, 246, ';
+      const cGrn = isDark ? 'rgba(52, 211, 153, ' : 'rgba(16, 185, 129, ';
+
+      // 1. Render Photorealistic 3D Forensic Concept Backdrop
+      let dw = W, dh = W / (1024 / 576);
+      if (dh < H) { dh = H; dw = H * (1024 / 576); }
+      const dx = (W - dw) / 2;
+      const dy = (H - dh) / 2;
+
+      if (curImg.complete && curImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.drawImage(curImg, dx, dy, dw, dh);
+
+        // Ambient depth vignette ensuring 100% UI text readability across viewports
+        const vig = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.25, W / 2, H / 2, Math.max(W, H) * 0.85);
+        vig.addColorStop(0, isDark ? 'rgba(10, 14, 26, 0.28)' : 'rgba(248, 250, 252, 0.32)');
+        vig.addColorStop(1, isDark ? 'rgba(10, 14, 26, 0.72)' : 'rgba(248, 250, 252, 0.76)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      }
+
+      // --- ANIMATION 1: Fingerprint Creating in Pixels (Top to Bottom -> Vanish -> Loop) ---
+      const fpBoxX = dx + 0.125 * dw;
+      const fpBoxY = dy + 0.045 * dh;
+      const fpBoxW = 0.330 * dw;
+      const fpBoxH = 0.650 * dh;
+
+      const fpPeriod = 7.0; // 7-second complete cycle
+      const fpCycle = t % fpPeriod;
+      let buildProgress = 0;
+      let fpOpacity = 1;
+
+      if (fpCycle < 3.5) {
+        // Assembling from top to bottom
+        buildProgress = fpCycle / 3.5;
+        fpOpacity = 1;
+      } else if (fpCycle < 5.0) {
+        // Fully assembled, glowing resonance
+        buildProgress = 1;
+        fpOpacity = 1;
+      } else if (fpCycle < 6.2) {
+        // Disintegrating into pixels and vanishing
+        buildProgress = 1;
+        fpOpacity = 1 - (fpCycle - 5.0) / 1.2;
+      } else {
+        // Brief pause before repeating
+        buildProgress = 0;
+        fpOpacity = 0;
+      }
+
+      if (fpOpacity > 0.01) {
+        ctx.save();
+        const rows = fpPattern.length;
+        const cols = fpPattern[0].length;
+        const cellW = fpBoxW / cols;
+        const cellH = fpBoxH / rows;
+        const maxRow = Math.floor(buildProgress * rows);
+        const curRowFrac = (buildProgress * rows) - maxRow;
+
+        for (let r = 0; r < rows; r++) {
+          if (r > maxRow) break;
+          const rowStr = fpPattern[r];
+          const isScanningEdge = (r === maxRow);
+          const cellAlpha = (isScanningEdge ? curRowFrac * fpOpacity : fpOpacity);
+
+          for (let c = 0; c < cols; c++) {
+            if (rowStr[c] === '#') {
+              const px = fpBoxX + c * cellW;
+              const py = fpBoxY + r * cellH;
+              // Pixel block with digital glow
+              ctx.fillStyle = cSky + (0.35 * cellAlpha).toFixed(3) + ')';
+              ctx.fillRect(px + 1, py + 1, cellW - 1.5, cellH - 1.5);
+
+              // Specular core on active pixels
+              if ((r + c) % 4 === 0) {
+                ctx.fillStyle = isDark ? `rgba(255, 255, 255, ${(0.45 * cellAlpha).toFixed(3)})` : `rgba(2, 132, 199, ${(0.6 * cellAlpha).toFixed(3)})`;
+                ctx.fillRect(px + cellW * 0.25, py + cellH * 0.25, cellW * 0.5, cellH * 0.5);
+              }
+            }
+          }
+        }
+
+        // Active laser scanline beam sweeping downwards
+        if (buildProgress > 0 && buildProgress < 1) {
+          const scanY = fpBoxY + buildProgress * fpBoxH;
+          ctx.beginPath();
+          ctx.moveTo(fpBoxX - 15, scanY);
+          ctx.lineTo(fpBoxX + fpBoxW + 15, scanY);
+          ctx.strokeStyle = cSky + (0.85 * fpOpacity).toFixed(3) + ')';
+          ctx.lineWidth = 2.5;
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#38bdf8';
+          ctx.stroke();
+
+          // Laser guide beam flare
+          ctx.beginPath();
+          ctx.arc(fpBoxX + fpBoxW * 0.5 + Math.sin(t * 8) * (fpBoxW * 0.4), scanY, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+        }
+
+        // Forensic ID badge when fully assembled
+        if (buildProgress >= 1 && fpOpacity > 0.3) {
+          ctx.font = '600 11px JetBrains Mono, monospace';
+          ctx.fillStyle = cSky + (0.9 * fpOpacity).toFixed(3) + ')';
+          ctx.fillText(`[ FP_RECONSTRUCTION: COMPLETE // 99.8% ]`, fpBoxX, fpBoxY + fpBoxH + 18);
+        }
+        ctx.restore();
+      }
+
+      // --- ANIMATION 2: Brain Neurons Activating & Sending Info (Floating Synaptic AI) ---
+      const bBaseX = dx + 0.765 * dw;
+      const bBaseY = dy + 0.260 * dh;
+      const bFloatY = Math.sin(t * 1.3) * 6;
+      const bFloatX = Math.cos(t * 0.9) * 3;
+
+      ctx.save();
+      ctx.translate(bFloatX, bFloatY);
+
+      // Compute screen positions of brain nodes
+      const nodeCoords = brainNodes.map(n => ({
+        x: dx + n.x * dw,
+        y: dy + n.y * dh
+      }));
+
+      // Draw axon synaptic pathways
+      brainEdges.forEach(([i, j]) => {
+        ctx.beginPath();
+        ctx.moveTo(nodeCoords[i].x, nodeCoords[i].y);
+        ctx.lineTo(nodeCoords[j].x, nodeCoords[j].y);
+        ctx.strokeStyle = cPur + '0.22)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      });
+
+      // Synaptic action potentials (traveling electric information pulses)
+      brainEdges.forEach(([i, j], idx) => {
+        const pulseSpeed = 1.1;
+        const progress = ((t * pulseSpeed) + idx * 0.16) % 1;
+        const px = nodeCoords[i].x + (nodeCoords[j].x - nodeCoords[i].x) * progress;
+        const py = nodeCoords[i].y + (nodeCoords[j].y - nodeCoords[i].y) * progress;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = (idx % 2 === 0 ? cSky : cGold) + '0.85)';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = idx % 2 === 0 ? '#38bdf8' : '#fbbf24';
+        ctx.fill();
+      });
+
+      // Brain neuron soma nodes (pulsing with activation blooms)
+      nodeCoords.forEach((p, idx) => {
+        const pulse = Math.sin(t * 2.5 + idx * 1.2) * 0.5 + 0.5;
+        const radius = 3.5 + pulse * 2.5;
+
+        // Glowing outer halo
+        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 3);
+        halo.addColorStop(0, (idx % 3 === 0 ? cGold : cSky) + (0.45 + pulse * 0.4) + ')');
+        halo.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Node center core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? '#ffffff' : (idx % 3 === 0 ? '#d97706' : '#0284c7');
+        ctx.fill();
+      });
+
+      // Neural telemetry label
+      ctx.font = '600 10px JetBrains Mono, monospace';
+      ctx.fillStyle = cPur + '0.75)';
+      ctx.fillText(`NEURAL_SYNAPSE // ACTIVE`, bBaseX + 15, bBaseY - 110);
+      ctx.restore();
+
+      // --- ANIMATION 3: Magnifying Glass Rotating/Floating & Searching Over Image ---
+      const lx = dx + 0.534 * dw;
+      const ly = dy + 0.625 * dh;
+      const lr = 0.136 * dw;
+
+      const mgFloatX = Math.cos(t * 0.7) * 4;
+      const mgFloatY = Math.sin(t * 0.8) * 4;
+      const searchAngle = t * 0.45;
+
+      ctx.save();
+      ctx.translate(mgFloatX, mgFloatY);
+
+      // Rotating forensic radar search sweep sector inside the lens
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr * 0.95, 0, Math.PI * 2);
+      ctx.clip(); // Keep search effects confined within the glass lens
+
+      // Radar sweep cone
+      const sweepGrad = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+      sweepGrad.addColorStop(0, cSky + '0.08)');
+      sweepGrad.addColorStop(1, cSky + '0.22)');
+      ctx.fillStyle = sweepGrad;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.arc(lx, ly, lr, searchAngle - 0.45, searchAngle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rotating search sweep line
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.lineTo(lx + Math.cos(searchAngle) * lr, ly + Math.sin(searchAngle) * lr);
+      ctx.strokeStyle = cSky + '0.75)';
+      ctx.lineWidth = 1.8;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#38bdf8';
+      ctx.stroke();
+
+      // Forensic super-resolution enhancement pixel grid scanning over the photo
+      const pGridSize = 14;
+      const scanPhase = (t * 1.5) % 1;
+      const scanLineX = lx - lr + scanPhase * (lr * 2);
+      for (let gx = lx - lr * 0.8; gx < lx + lr * 0.8; gx += pGridSize) {
+        for (let gy = ly - lr * 0.8; gy < ly + lr * 0.8; gy += pGridSize) {
+          const distFromCenter = Math.hypot(gx - lx, gy - ly);
+          if (distFromCenter < lr * 0.88 && Math.abs(gx - scanLineX) < pGridSize * 2) {
+            ctx.strokeStyle = cSky + '0.35)';
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(gx, gy, pGridSize - 2, pGridSize - 2);
+            if ((gx + gy) % 3 === 0) {
+              ctx.fillStyle = cSky + '0.18)';
+              ctx.fillRect(gx, gy, pGridSize - 2, pGridSize - 2);
+            }
+          }
+        }
+      }
+      ctx.restore();
+
+      // Forensic HUD reticle over lens circumference
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+      ctx.strokeStyle = cSky + '0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Reticle crosshair ticks
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+        ctx.beginPath();
+        ctx.moveTo(lx + Math.cos(a) * (lr - 8), ly + Math.sin(a) * (lr - 8));
+        ctx.lineTo(lx + Math.cos(a) * (lr + 8), ly + Math.sin(a) * (lr + 8));
+        ctx.strokeStyle = cSky + '0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Specular rotating light glint along chrome rim
+      const glintAngle = Math.sin(t * 0.8) * Math.PI;
+      const gx = lx + Math.cos(glintAngle) * lr;
+      const gy = ly + Math.sin(glintAngle) * lr;
+      ctx.beginPath();
+      ctx.arc(gx, gy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#fff';
+      ctx.fill();
+
+      // Dynamic telemetry readout
+      ctx.font = '600 10px JetBrains Mono, monospace';
+      ctx.fillStyle = cSky + '0.85)';
+      ctx.fillText(`TARGET_LOC // RESOLVING 4K OPTICAL`, lx - 65, ly + lr + 18);
+      ctx.restore();
+
+      // --- ANIMATION 4: Floating Photo Depth Markers ---
+      const photoX = dx + 0.100 * dw;
+      const photoY = dy + 0.640 * dh;
+      const photoW = 0.410 * dw;
+      const photoH = 0.310 * dh;
+      const pPulse = Math.sin(t * 2) * 0.3 + 0.7;
+
+      ctx.save();
+      ctx.strokeStyle = cSky + (0.45 * pPulse).toFixed(3) + ')';
+      ctx.lineWidth = 1.5;
+      // Corner brackets on the crime scene photo
+      const brLen = 12;
+      // Top-left
+      ctx.beginPath(); ctx.moveTo(photoX, photoY + brLen); ctx.lineTo(photoX, photoY); ctx.lineTo(photoX + brLen, photoY); ctx.stroke();
+      // Bottom-left
+      ctx.beginPath(); ctx.moveTo(photoX, photoY + photoH - brLen); ctx.lineTo(photoX, photoY + photoH); ctx.lineTo(photoX + brLen, photoY + photoH); ctx.stroke();
+      // Bottom-right
+      ctx.beginPath(); ctx.moveTo(photoX + photoW - brLen, photoY + photoH); ctx.lineTo(photoX + photoW, photoY + photoH); ctx.lineTo(photoX + photoW, photoY + photoH - brLen); ctx.stroke();
+      ctx.restore();
+
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+  }
 })();
+
+
