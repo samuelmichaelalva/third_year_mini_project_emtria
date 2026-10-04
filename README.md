@@ -3,13 +3,13 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Hardware: RTX 4050 6GB](https://img.shields.io/badge/Hardware-RTX%204050%206GB-green.svg)](https://www.nvidia.com)
-[![Status: In Development](https://img.shields.io/badge/Status-Milestone%201%20Planning-orange.svg)](#phased-development-milestones)
+[![Status: In Development](https://img.shields.io/badge/Status-Milestone%201%20Planning-orange.svg)](#-phased-development-milestones)
 
 ---
 
 ## 📌 Project Overview
 
-**EMTRIA** (*Evidence-grounded Multimodal Traceable Reporting & Intelligence Architecture*) is a forensic decision-support AI framework designed to analyze preliminary crime-scene evidence across three modalities:
+**EMTRIA** (*Evidence-grounded Multimodal Traceable Reporting & Intelligence Architecture*) is an AI-assisted forensic decision-support framework designed to analyze preliminary crime-scene evidence across three modalities:
 - 📷 **Images**: Crime-scene photography & physical evidence localization.
 - 🎥 **Video**: Surveillance / CCTV footage & temporal event keyframe extraction.
 - 🎙️ **Audio**: Spoken dialogue, voice notes & emergency call speech transcription.
@@ -23,71 +23,51 @@
 
 ## 🏛️ System Architecture
 
-\\\
-                  ┌──────────────────────────────────────────────┐
-                  │              RAW EVIDENCE INPUTS             │
-                  │   Images (.jpg/.png) | Video (.mp4) | Audio  │
-                  └──────────────────────┬───────────────────────┘
-                                         │
-                 ┌───────────────────────┼───────────────────────┐
-                 ▼                       ▼                       ▼
-      ┌──────────────────────┐┌──────────────────────┐┌──────────────────────┐
-      │    IMAGE MODALITY    ││    VIDEO MODALITY    ││    AUDIO MODALITY    │
-      │   Florence-2-base    ││   OpenCV Sampling    ││     Whisper-base     │
-      │  (Dense description, ││(Frame & timestamp    ││(Speech transcription │
-      │   phrase grounding,  ││ extraction ➔ Florence││ with timestamped     │
-      │   bounding boxes)    ││ visual evaluation)   ││ speech segments)     │
-      └──────────┬───────────┘└──────────┬───────────┘└──────────┬───────────┘
-                 │                       │                       │
-                 ▼                       ▼                       ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │                    CANDIDATE OBSERVATIONS LAYER                      │
-      │ Status: "candidate_observation" | Bounding Boxes | Segment Timestamps│
-      └──────────────────────────────────┬───────────────────────────────────┘
-                                         │
-                                         ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │             TEMPORAL & CROSS-MODAL CORRELATION LAYER                 │
-      │   Aligns video timestamps with audio dialogue; correlates repeated   │
-      │   visual entities across photos and frames into coherent sequences.  │
-      └──────────────────────────────────┬───────────────────────────────────┘
-                                         │
-                                         ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │                    STRUCTURED EVIDENCE JSON                          │
-      │ Standardized schema: evidence_id, source, location, model confidence │
-      └──────────────────────────────────┬───────────────────────────────────┘
-                                         │
-                                         ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │                  DETERMINISTIC VALIDATION ENGINE                     │
-      │ Classifies into: Direct Observation | Cautious Inference | Unverified│
-      │ Filters unsupported assumptions without relying on generative AI.    │
-      └──────────────────────────────────┬───────────────────────────────────┘
-                                         │
-                                         ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │               STRUCTURED CLAIMS GENERATOR (Local LLM)                │
-      │ Ollama (Llama-3.2-3B) outputs structured JSON:                       │
-      │ { claim: string, claim_type: string, evidence_ids: [string] }        │
-      └──────────────────────────────────┬───────────────────────────────────┘
-                                         │
-                                         ▼
-      ┌──────────────────────────────────────────────────────────────────────┐
-      │                   DETERMINISTIC CLAIM CHECKER                        │
-      │ Enforces existence, valid schema, and admissible status of cited IDs.│
-      │ (Rejects fabricated IDs or claims lacking referenced evidence).      │
-      └──────────────────────┬────────────────────────┬──────────────────────┘
-                             │                        │
-                   [Evidence ID Valid]       [Evidence ID Missing]
-                             │                        │
-                             ▼                        ▼
-      ┌──────────────────────────────┐       ┌──────────────────────┐
-      │     REPORT RENDERER & UI     │       │    REJECT / FLAG     │
-      │ Renders interactive report:  │       │ Discards unbacked    │
-      │ Click citation ➔ jumps to    │       │ claims or marks them │
-      │ bounding box or timestamp.   │       │ as unverified.       │
-      └──────────────────────────────┘       └──────────────────────┘
+\\\mermaid
+flowchart TD
+    subgraph INPUTS["1. RAW EVIDENCE INPUTS"]
+        direction LR
+        IMG_IN["📷 Images (.jpg/.png)"]
+        VID_IN["🎥 Video (.mp4)"]
+        AUD_IN["🎙️ Audio (.wav/.mp3)"]
+    end
+
+    subgraph MODALITIES["2. MODALITY ANALYZERS (Sequential Execution)"]
+        direction LR
+        M_IMG["<b>Image: Florence-2-base</b><br/>• Dense visual captioning<br/>• Phrase grounding<br/>• Bounding box coordinates"]
+        M_VID["<b>Video: OpenCV + Florence-2</b><br/>• Deterministic frame sampling<br/>• Timestamp extraction<br/>• Candidate visual analysis"]
+        M_AUD["<b>Audio: Whisper-base</b><br/>• Speech-to-text (ASR)<br/>• Timestamped dialogue segments"]
+    end
+
+    IMG_IN --> M_IMG
+    VID_IN --> M_VID
+    AUD_IN --> M_AUD
+
+    M_IMG --> CANDIDATE["<b>3. CANDIDATE OBSERVATIONS LAYER</b><br/>Status: candidate_observation | Coordinates | Timestamps"]
+    M_VID --> CANDIDATE
+    M_AUD --> CANDIDATE
+
+    CANDIDATE --> CORR["<b>4. TEMPORAL & CROSS-MODAL CORRELATION</b><br/>Aligns video timestamps with audio dialogue & tracks entities"]
+
+    CORR --> EVIDENCE_JSON["<b>5. STRUCTURED EVIDENCE JSON</b><br/>evidence_id • source • location • model confidence"]
+
+    EVIDENCE_JSON --> RULES["<b>6. DETERMINISTIC VALIDATION ENGINE</b><br/>Direct Observations | Cautious Inferences | Unverified Checks<br/>(Filters unsupported assumptions without LLM)"]
+
+    RULES --> LLM["<b>7. STRUCTURED CLAIMS GENERATOR (Local LLM)</b><br/>Ollama (Llama-3.2-3B) outputs structured JSON:<br/>{ claim, claim_type, evidence_ids }"]
+
+    LLM --> CHECKER{"<b>8. DETERMINISTIC CLAIM CHECKER</b><br/>Enforces valid evidence_id existence & schema"}
+
+    CHECKER -->|Valid Citations| REPORT["<b>9. INTERACTIVE FORENSIC REPORT</b><br/>Rendered report with clickable evidence links"]
+    CHECKER -->|Missing / Invalid ID| REJECT["<b>REJECT / UNVERIFIED FLAG</b><br/>Discards or flags ungrounded assertions"]
+
+    classDef primary fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef secondary fill:#0f172a,stroke:#64748b,stroke-width:1px,color:#e2e8f0;
+    classDef highlight fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ecfdf5;
+    classDef reject fill:#450a0a,stroke:#f87171,stroke-width:2px,color:#fef2f2;
+    class INPUTS,MODALITIES secondary;
+    class CANDIDATE,CORR,EVIDENCE_JSON,RULES,LLM,CHECKER primary;
+    class REPORT highlight;
+    class REJECT reject;
 \\\
 
 ---
