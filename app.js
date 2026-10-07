@@ -11,7 +11,7 @@
 
   // Navigation & Dynamic Step 2 Sync
   window.go = function(n) {
-    if (n === 2 && totalFiles() === 0) return alert('Please stage at least one evidence file before running analysis.');
+    // Navigation allows previewing Step 2 architecture
     if (n === 2) syncPipeline();
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     $('step' + n).classList.add('active');
@@ -78,7 +78,16 @@
     if (!el) return;
     el.ondragover = e => { e.preventDefault(); el.classList.add('drag'); };
     el.ondragleave = () => el.classList.remove('drag');
-    el.ondrop = e => { e.preventDefault(); el.classList.remove('drag'); if (e.dataTransfer.files.length) onFile(type, { target: { files: e.dataTransfer.files } }); };
+    el.ondrop = e => {
+      e.preventDefault();
+      el.classList.remove('drag');
+      if (!e.dataTransfer.files.length) return;
+      if (!authManager.isLoggedIn()) {
+        authManager.requestAuth('files', { type, files: Array.from(e.dataTransfer.files) }, 'Officer Authentication Required to ingest dropped files into custody');
+        return;
+      }
+      onFile(type, { target: { files: e.dataTransfer.files } });
+    };
   });
 
   // Dynamic Pipeline Adaptation (Step 2)
@@ -501,6 +510,248 @@
     }
     requestAnimationFrame(render);
   }
+
+  // ==========================================================
+  // FORENSIC OFFICER AUTHENTICATION & CHAIN-OF-CUSTODY MANAGER
+  // ==========================================================
+  const DEFAULT_OFFICERS = [
+    { badge: 'DET-4092', name: 'Lead Inv. Samuel N.', unit: 'Cyber & Physical Forensics Div', pass: 'emtria2026' }
+  ];
+
+  const authManager = {
+    pendingAction: null,
+    getUsers() {
+      try {
+        const stored = localStorage.getItem('emtria_users');
+        if (!stored) {
+          localStorage.setItem('emtria_users', JSON.stringify(DEFAULT_OFFICERS));
+          return [...DEFAULT_OFFICERS];
+        }
+        return JSON.parse(stored);
+      } catch (e) {
+        return [...DEFAULT_OFFICERS];
+      }
+    },
+    getActiveUser() {
+      try {
+        const u = localStorage.getItem('emtria_active_user');
+        return u ? JSON.parse(u) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+    setActiveUser(user) {
+      if (user) {
+        localStorage.setItem('emtria_active_user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('emtria_active_user');
+      }
+      this.syncAuthNav();
+    },
+    isLoggedIn() {
+      return !!this.getActiveUser();
+    },
+    syncAuthNav() {
+      const slot = $('auth-nav-slot');
+      if (!slot) return;
+      const user = this.getActiveUser();
+      if (user) {
+        const shortName = user.name.replace(/^(Lead |Det\. |Inv\. )/, '');
+        slot.innerHTML =
+          '<div class="officer-badge-pill" title="' + user.name + ' (' + (user.unit || 'Forensics') + ')">' +
+            '<span class="status-pulse-dot"></span>' +
+            '<span class="officer-name">' + user.badge + ' \u00b7 ' + shortName + '</span>' +
+            '<button class="btn-signout" onclick="authSignOut()" title="Sign Out">\u2715</button>' +
+          '</div>';
+      } else {
+        slot.innerHTML =
+          '<button type="button" class="btn-officer-login" onclick="openAuthModal(\'Officer Authentication for Evidence Intake\')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;display:inline-block;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Officer Access' +
+          '</button>';
+      }
+    },
+    requestAuth(actionType, payload, reason) {
+      this.pendingAction = { type: actionType, payload: payload };
+      openAuthModal(reason || 'Officer Authentication Required to stage Chain-of-Custody evidence');
+    },
+    login(badge, pass) {
+      const users = this.getUsers();
+      const user = users.find(u => u.badge.toUpperCase() === badge.trim().toUpperCase() && u.pass === pass);
+      if (user) {
+        this.setActiveUser(user);
+        completeAuthSuccess(user);
+        return true;
+      }
+      return false;
+    },
+    register(name, badge, unit, pass) {
+      const users = this.getUsers();
+      const exists = users.some(u => u.badge.toUpperCase() === badge.trim().toUpperCase());
+      if (exists) {
+        showToast('Badge ' + badge.toUpperCase() + ' is already registered in EMTRIA system', 'warn');
+        return false;
+      }
+      const newUser = { name: name.trim(), badge: badge.trim().toUpperCase(), unit: unit.trim(), pass: pass };
+      users.push(newUser);
+      localStorage.setItem('emtria_users', JSON.stringify(users));
+      this.setActiveUser(newUser);
+      completeAuthSuccess(newUser);
+      return true;
+    },
+    logout() {
+      this.setActiveUser(null);
+      this.pendingAction = null;
+      showToast('🔒 Officer signed out. Evidence upload is locked to guests.', 'info');
+    }
+  };
+
+  function completeAuthSuccess(user) {
+    closeAuthModal();
+    showToast('\u2714 Welcome, ' + user.name + ' (' + user.badge + ') \u2014 Authorized', 'success');
+    const act = authManager.pendingAction;
+    authManager.pendingAction = null;
+    if (!act) return;
+
+    if (act.type === 'picker') {
+      setTimeout(function() {
+        const inp = $('inp-' + act.payload);
+        if (inp) inp.click();
+      }, 120);
+    } else if (act.type === 'files') {
+      setTimeout(function() {
+        if (act.payload && act.payload.files && act.payload.files.length) {
+          onFile(act.payload.type, { target: { files: act.payload.files } });
+          showToast('📁 Staged ' + act.payload.files.length + ' dropped file(s) into custody', 'info');
+        }
+      }, 120);
+    } else if (act.type === 'run') {
+      setTimeout(function() {
+        go(2);
+      }, 120);
+    }
+  }
+
+  // Window-level handlers for HTML integration
+  window.handleEvidenceClick = function(type) {
+    if (!authManager.isLoggedIn()) {
+      authManager.requestAuth('picker', type, 'Officer Authentication Required to stage Chain-of-Custody evidence');
+    } else {
+      const inp = $('inp-' + type);
+      if (inp) inp.click();
+    }
+  };
+
+  window.handleRunAnalysis = function() {
+    if (!authManager.isLoggedIn()) {
+      authManager.requestAuth('run', null, 'Officer Sign-In Required to execute AI Pipeline on RTX 4050');
+    } else {
+      if (totalFiles() === 0) {
+        showToast('Stage at least one evidence file before executing pipeline.', 'warn');
+        return;
+      }
+      go(2);
+    }
+  };
+
+  window.loginDemoOfficer = function() {
+    const defaultUser = DEFAULT_OFFICERS[0];
+    authManager.setActiveUser(defaultUser);
+    completeAuthSuccess(defaultUser);
+  };
+
+  window.authSignOut = function() {
+    authManager.logout();
+  };
+
+  window.openAuthModal = function(reason) {
+    const modal = $('auth-modal');
+    if (!modal) return;
+    if (reason && $('auth-gate-reason')) {
+      $('auth-gate-reason').textContent = '\u26a0\ufe0f ' + reason;
+    }
+    modal.style.display = 'flex';
+    switchAuthTab('signin');
+    setTimeout(function() {
+      const inp = $('signin-badge');
+      if (inp) inp.focus();
+    }, 60);
+  };
+
+  window.closeAuthModal = function() {
+    const modal = $('auth-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.switchAuthTab = function(tab) {
+    const isSignIn = tab === 'signin';
+    const tabIn = $('tab-signin'), tabReg = $('tab-register');
+    const formIn = $('form-signin'), formReg = $('form-register');
+    if (tabIn) tabIn.className = 'auth-tab' + (isSignIn ? ' active' : '');
+    if (tabReg) tabReg.className = 'auth-tab' + (!isSignIn ? ' active' : '');
+    if (formIn) formIn.style.display = isSignIn ? 'block' : 'none';
+    if (formReg) formReg.style.display = !isSignIn ? 'block' : 'none';
+  };
+
+  window.handleSignInSubmit = function(e) {
+    e.preventDefault();
+    const badge = $('signin-badge').value;
+    const pass = $('signin-pass').value;
+    const success = authManager.login(badge, pass);
+    if (!success) {
+      showToast('\u274c Invalid Officer ID or PIN. Use the Quick Demo button for 1-click test.', 'error');
+    }
+  };
+
+  window.handleRegisterSubmit = function(e) {
+    e.preventDefault();
+    const name = $('reg-name').value;
+    const badge = $('reg-badge').value;
+    const unit = $('reg-unit').value;
+    const pass = $('reg-pass').value;
+    authManager.register(name, badge, unit, pass);
+  };
+
+  window.showToast = function(msg, type) {
+    type = type || 'info';
+    const box = $('toast-box');
+    if (!box) return;
+    const item = document.createElement('div');
+    var cls = 'toast-item';
+    if (type === 'success') cls += ' toast-success';
+    else if (type === 'warn') cls += ' toast-warn';
+    else if (type === 'error') cls += ' toast-error';
+    item.className = cls;
+    item.innerHTML = '<span>' + msg + '</span>';
+    box.appendChild(item);
+    setTimeout(function() {
+      item.classList.add('hiding');
+      setTimeout(function() { item.remove(); }, 250);
+    }, 3500);
+  };
+
+  // Sync initial nav state
+  authManager.syncAuthNav();
+
+  // Scroll Reveal Observer
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.upload-card, .pipeline, .cat, .inspector, .action-bar').forEach(function(el) {
+      el.classList.add('reveal-on-scroll');
+      revealObserver.observe(el);
+    });
+  }
+
+  // Keyboard shortcut: ESC to close auth modal
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAuthModal();
+  });
+
 })();
 
 

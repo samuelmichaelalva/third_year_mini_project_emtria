@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,13 +18,16 @@
       <img src="logo-light.png" alt="EMTRIA Logo" class="brand-logo logo-light">
     </a>
     <div class="steps">
-      <button class="s-btn active" id="sb1" onclick="go(1)">1 Upload</button>
+      <button type="button" class="s-btn active" id="sb1" onclick="go(1)">1 Upload</button>
       <span class="line" id="ln1"></span>
-      <button class="s-btn" id="sb2" onclick="go(2)">2 Process</button>
+      <button type="button" class="s-btn" id="sb2" onclick="go(2)">2 Process</button>
       <span class="line" id="ln2"></span>
-      <button class="s-btn" id="sb3" onclick="go(3)">3 Report</button>
+      <button type="button" class="s-btn" id="sb3" onclick="go(3)">3 Report</button>
     </div>
-    <button class="theme-btn" id="theme-toggle" title="Toggle theme">☀️</button>
+    <div class="nav-right">
+      <div id="auth-nav-slot"></div>
+      <button class="theme-btn" id="theme-toggle" title="Toggle theme">☀️</button>
+    </div>
   </nav>
 
   <!-- STEP 1: UPLOAD -->
@@ -43,7 +46,7 @@
       <div class="upload-grid">
         <div class="upload-card" id="card-pic">
           <div class="card-head"><span class="tag blue">📷 PHOTOS</span><span class="pill" id="pic-st">0 Files</span></div>
-          <div class="dropzone" id="dz-pic" onclick="$('inp-pic').click()">
+          <div class="dropzone" id="dz-pic" onclick="handleEvidenceClick('pic')">
             <input type="file" id="inp-pic" accept="image/*" multiple hidden onchange="onFile('pic',event)">
             <div class="file-list" id="fl-pic" style="display:none"></div>
             <div class="empty" id="em-pic">
@@ -52,12 +55,12 @@
               <small>JPEG, PNG, WEBP (Multiple)</small>
             </div>
           </div>
-          <div class="card-foot"><span class="fname" id="fn-pic">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();$('inp-pic').click()">+ Add</button></div>
+          <div class="card-foot"><span class="fname" id="fn-pic">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();handleEvidenceClick('pic')">+ Add</button></div>
         </div>
 
         <div class="upload-card" id="card-vid">
           <div class="card-head"><span class="tag purple">🎥 VIDEOS</span><span class="pill" id="vid-st">0 Files</span></div>
-          <div class="dropzone" id="dz-vid" onclick="$('inp-vid').click()">
+          <div class="dropzone" id="dz-vid" onclick="handleEvidenceClick('vid')">
             <input type="file" id="inp-vid" accept="video/*" multiple hidden onchange="onFile('vid',event)">
             <div class="file-list" id="fl-vid" style="display:none"></div>
             <div class="empty" id="em-vid">
@@ -66,12 +69,12 @@
               <small>MP4, MKV, MOV (Multiple)</small>
             </div>
           </div>
-          <div class="card-foot"><span class="fname" id="fn-vid">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();$('inp-vid').click()">+ Add</button></div>
+          <div class="card-foot"><span class="fname" id="fn-vid">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();handleEvidenceClick('vid')">+ Add</button></div>
         </div>
 
         <div class="upload-card" id="card-aud">
           <div class="card-head"><span class="tag amber">🎙️ AUDIO</span><span class="pill" id="aud-st">0 Files</span></div>
-          <div class="dropzone" id="dz-aud" onclick="$('inp-aud').click()">
+          <div class="dropzone" id="dz-aud" onclick="handleEvidenceClick('aud')">
             <input type="file" id="inp-aud" accept="audio/*" multiple hidden onchange="onFile('aud',event)">
             <div class="file-list" id="fl-aud" style="display:none"></div>
             <div class="empty" id="em-aud">
@@ -80,13 +83,13 @@
               <small>WAV, MP3, FLAC (Multiple)</small>
             </div>
           </div>
-          <div class="card-foot"><span class="fname" id="fn-aud">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();$('inp-aud').click()">+ Add</button></div>
+          <div class="card-foot"><span class="fname" id="fn-aud">No files selected</span><button type="button" class="add-btn" onclick="event.stopPropagation();handleEvidenceClick('aud')">+ Add</button></div>
         </div>
       </div>
 
       <div class="action-bar">
         <span id="status-msg">⚪ No evidence files loaded</span>
-        <button class="btn primary" id="btn-run" onclick="go(2)">Run AI Analysis →</button>
+        <button class="btn primary" id="btn-run" onclick="handleRunAnalysis()">Run AI Analysis →</button>
       </div>
     </section>
 
@@ -205,6 +208,106 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  
+  <!-- FORENSIC AUTHENTICATION MODAL -->
+  <div id="auth-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeAuthModal()">
+    <div class="modal-box forensic-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+      <div class="modal-header">
+        <div class="modal-badge-title">
+          <span class="auth-icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <div>
+            <h3 id="auth-modal-title">Forensic Officer Access</h3>
+            <span class="sub-modal">Chain-of-Custody Audit System · EMTRIA Core</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close" onclick="closeAuthModal()" title="Close (ESC)">✕</button>
+      </div>
+
+      <div class="auth-notice" id="auth-gate-reason">
+        ⚠️ Officer Authentication Required to stage Chain-of-Custody evidence.
+      </div>
+
+      <div class="demo-quick-access">
+        <button type="button" class="btn-demo-quick" onclick="loginDemoOfficer()">
+          <span class="quick-bolt">⚡</span>
+          <div class="quick-text">
+            <strong>1-Click Quick Examiner Demo</strong>
+            <small>Instant sign-in as Lead Inv. Samuel N. (DET-4092)</small>
+          </div>
+          <span class="quick-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="auth-divider"><span>OR ENTER CREDENTIALS</span></div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Officer Sign In</button>
+        <button type="button" class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">New Officer Registry</button>
+      </div>
+
+      <form id="form-signin" onsubmit="handleSignInSubmit(event)">
+        <div class="form-group">
+          <label for="signin-badge">OFFICER BADGE / EXAMINER ID</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">🆔</span>
+            <input type="text" id="signin-badge" placeholder="e.g. DET-4092" required autocomplete="username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="signin-pass">ACCESS PIN / PASSWORD</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">🔒</span>
+            <input type="password" id="signin-pass" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary auth-submit-btn">Authorize &amp; Stage Evidence →</button>
+        </div>
+      </form>
+
+      <form id="form-register" style="display:none;" onsubmit="handleRegisterSubmit(event)">
+        <div class="form-group">
+          <label for="reg-name">FULL NAME &amp; RANK</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">👤</span>
+            <input type="text" id="reg-name" placeholder="e.g. Det. Sarah Connor" required autocomplete="name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-badge">ASSIGNED BADGE ID</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">🆔</span>
+            <input type="text" id="reg-badge" placeholder="e.g. DET-5510" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-unit">FORENSIC UNIT / LAB</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">🏢</span>
+            <input type="text" id="reg-unit" placeholder="e.g. Cyber &amp; Physical Forensics Div" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-pass">CREATE ACCESS PIN / PASSWORD</label>
+          <div class="input-with-icon">
+            <span class="inp-icon">🔒</span>
+            <input type="password" id="reg-pass" placeholder="Minimum 4 characters" minlength="4" required autocomplete="new-password">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary auth-submit-btn">Register Officer Credentials →</button>
+        </div>
+      </form>
+
+      <div class="modal-footer-note">
+        🔒 All uploads cryptographically hashed (SHA-256) and signed to officer identity per ISO/IEC 27037 standards.
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-box"></div>
+
+  <script src="app.js?v=2.2"></script>
 </body>
 </html>

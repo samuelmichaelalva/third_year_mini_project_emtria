@@ -15,8 +15,10 @@ nav { height:62px; background:var(--card); backdrop-filter:blur(14px); -webkit-b
 [data-theme="light"] .logo-dark { display:none; }
 [data-theme="light"] .logo-light { display:block; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.08)); }
 .print-logo { display:none; }
-.steps { display:flex; align-items:center; gap:6px; }
-.s-btn { background:none; border:none; color:var(--muted); font:600 13px var(--font); padding:6px 14px; border-radius:99px; cursor:pointer; transition:.15s; }
+.steps { display:flex; align-items:center; gap:6px; position:relative; z-index:10; }
+.s-btn { background:none; border:none; color:var(--muted); font:600 13px var(--font); padding:6px 14px; border-radius:99px; cursor:pointer; transition:.15s; user-select:none; }
+.s-btn:hover:not(.active):not(.done) { background:rgba(0,0,0,0.06); color:var(--text); }
+[data-theme="dark"] .s-btn:hover:not(.active):not(.done) { background:rgba(255,255,255,0.08); }
 .s-btn.active { background:var(--accent); color:#fff; }
 .s-btn.done { background:var(--green); color:#fff; }
 .line { width:24px; height:2px; background:var(--border); }
@@ -159,4 +161,371 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px; te
   .insp-meta small { color:#555 !important; }
   .insp-meta span { color:#000 !important; }
   .print-logo { display:block !important; height:44px; width:auto; margin-bottom:14px; }
+}
+
+
+/* ============================================================
+   EMTRIA FORENSIC AUTH & ACCESS CONTROL SYSTEM
+   ============================================================ */
+
+/* NAV RIGHT & OFFICER ACCESS */
+.nav-right { display:flex; align-items:center; gap:12px; }
+
+.btn-officer-login {
+  background:var(--subtle);
+  border:1px solid var(--border);
+  color:var(--accent);
+  font:600 12px var(--font);
+  padding:6px 14px;
+  border-radius:99px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all .18s ease;
+}
+.btn-officer-login:hover {
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 0 12px rgba(56,189,248,.35);
+  transform:translateY(-1px);
+}
+
+.officer-badge-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(52,211,153,.12);
+  border:1px solid rgba(52,211,153,.35);
+  color:var(--green);
+  padding:4px 10px;
+  border-radius:99px;
+  font:600 12px var(--mono);
+}
+.status-pulse-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulseDot 2s infinite ease-in-out;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity:1; transform:scale(1); }
+  50% { opacity:.35; transform:scale(0.85); }
+}
+.officer-name {
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.btn-signout {
+  background:none;
+  border:none;
+  color:var(--dim);
+  font-size:13px;
+  cursor:pointer;
+  padding:2px 4px;
+  border-radius:4px;
+  line-height:1;
+  transition:.15s;
+}
+.btn-signout:hover {
+  color:var(--red);
+  background:rgba(239,68,68,.15);
+}
+
+/* AUTH MODAL OVERLAY */
+.modal-overlay {
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(4, 7, 14, 0.78);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  animation:modalFadeIn .2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="light"] .modal-overlay {
+  background:rgba(241, 245, 249, 0.82);
+}
+@keyframes modalFadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+.modal-box.forensic-card {
+  width:100%;
+  max-width:480px;
+  background:var(--card-solid);
+  border:1px solid var(--border);
+  box-shadow:0 24px 60px rgba(0,0,0,0.6), 0 0 25px rgba(56,189,248,0.18);
+  border-radius:14px;
+  padding:24px;
+  position:relative;
+  animation:modalPop .24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="light"] .modal-box.forensic-card {
+  box-shadow:0 24px 60px rgba(0,0,0,0.12), 0 0 20px rgba(2,132,199,0.1);
+}
+@keyframes modalPop {
+  from { opacity:0; transform:scale(0.94) translateY(8px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.modal-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.modal-badge-title {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.auth-icon-badge {
+  font-size:24px;
+  background:rgba(56,189,248,.12);
+  padding:6px;
+  border-radius:8px;
+  display:inline-flex;
+}
+.modal-header h3 {
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:-.2px;
+  margin:0;
+  text-shadow:none;
+}
+.sub-modal {
+  font:500 11px var(--mono);
+  color:var(--muted);
+  display:block;
+  margin-top:2px;
+}
+.modal-close {
+  background:var(--subtle);
+  border:1px solid var(--border);
+  color:var(--muted);
+  width:28px;
+  height:28px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+.modal-close:hover {
+  color:var(--text);
+  border-color:var(--accent);
+}
+
+.auth-notice {
+  font:500 12px var(--mono);
+  background:rgba(251,191,36,.1);
+  border:1px solid rgba(251,191,36,.3);
+  color:var(--amber);
+  padding:8px 12px;
+  border-radius:6px;
+  margin-bottom:16px;
+  line-height:1.4;
+}
+
+/* 1-CLICK DEMO BUTTON */
+.demo-quick-access {
+  margin-bottom:16px;
+}
+.btn-demo-quick {
+  width:100%;
+  background:rgba(56,189,248,0.08);
+  border:1px dashed var(--accent);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+  transition:all .18s ease;
+}
+.btn-demo-quick:hover {
+  background:rgba(56,189,248,0.18);
+  border-style:solid;
+  border-color:var(--accent);
+  box-shadow:0 0 16px rgba(56,189,248,0.25);
+  transform:translateY(-1px);
+}
+.quick-bolt { font-size:18px; margin-right:8px; }
+.quick-text { flex:1; }
+.quick-text strong { display:block; font-size:12px; color:var(--accent); letter-spacing:-.2px; }
+.quick-text small { display:block; font-size:11px; color:var(--muted); font-family:var(--mono); }
+.quick-arrow { font-size:15px; color:var(--accent); font-weight:700; }
+
+.auth-divider {
+  display:flex;
+  align-items:center;
+  text-align:center;
+  margin:14px 0;
+  color:var(--dim);
+}
+.auth-divider::before, .auth-divider::after {
+  content:'';
+  flex:1;
+  border-bottom:1px solid var(--border);
+}
+.auth-divider span {
+  padding:0 10px;
+  font:700 9px var(--mono);
+  letter-spacing:.8px;
+}
+
+/* TABS */
+.auth-tabs {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  background:var(--subtle);
+  padding:4px;
+  border-radius:8px;
+  margin-bottom:16px;
+  border:1px solid var(--border);
+}
+.auth-tab {
+  background:none;
+  border:none;
+  padding:7px 10px;
+  border-radius:6px;
+  font:600 12px var(--font);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.auth-tab.active {
+  background:var(--card-solid);
+  color:var(--text);
+  box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  font-weight:700;
+}
+
+/* FORM FIELDS */
+.form-group {
+  margin-bottom:14px;
+}
+.form-group label {
+  display:block;
+  font:700 10px var(--mono);
+  color:var(--muted);
+  margin-bottom:5px;
+  letter-spacing:.3px;
+}
+.input-with-icon {
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+.inp-icon {
+  position:absolute;
+  left:10px;
+  font-size:14px;
+  pointer-events:none;
+  opacity:.75;
+}
+.input-with-icon input {
+  width:100%;
+  background:var(--subtle);
+  border:1px solid var(--border);
+  color:var(--text);
+  font:500 13px var(--mono);
+  padding:9px 12px 9px 34px;
+  border-radius:6px;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.input-with-icon input:focus {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(56,189,248,0.18);
+}
+.input-with-icon input::placeholder {
+  color:var(--dim);
+}
+.form-actions {
+  margin-top:6px;
+}
+.auth-submit-btn {
+  width:100%;
+  justify-content:center;
+  padding:10px;
+  font-size:13px;
+  font-weight:700;
+}
+.modal-footer-note {
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+  font:500 10px var(--mono);
+  color:var(--dim);
+  text-align:center;
+  line-height:1.4;
+}
+
+/* TOAST NOTIFICATION CONTAINER */
+#toast-box {
+  position:fixed;
+  top:76px;
+  right:24px;
+  z-index:10000;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  pointer-events:none;
+}
+.toast-item {
+  pointer-events:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--card-solid);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:10px 16px;
+  border-radius:8px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.45);
+  font:500 12px var(--font);
+  animation:toastSlideIn .25s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width:260px;
+  max-width:380px;
+}
+.toast-item.toast-success { border-color:var(--green); }
+.toast-item.toast-warn { border-color:var(--amber); }
+.toast-item.toast-error { border-color:var(--red); }
+.toast-item.hiding { animation:toastFadeOut .2s forwards ease-in; }
+@keyframes toastSlideIn {
+  from { opacity:0; transform:translateX(30px) scale(0.95); }
+  to { opacity:1; transform:translateX(0) scale(1); }
+}
+@keyframes toastFadeOut {
+  from { opacity:1; transform:translateX(0); }
+  to { opacity:0; transform:translateX(30px); }
+}
+
+/* SCROLL REVEAL UTILITY */
+.reveal-on-scroll {
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .45s cubic-bezier(0.16, 1, 0.3, 1), transform .45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-on-scroll.revealed {
+  opacity:1;
+  transform:translateY(0);
 }
