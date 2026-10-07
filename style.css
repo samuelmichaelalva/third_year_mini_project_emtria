@@ -794,4 +794,14 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px; te
   .auth-brand-reason { display: none; }
   .auth-form-panel { padding: 28px 20px 24px; }
 }
+
+.auth-logo-img {
+  width: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  margin-bottom: 16px;
+  filter: brightness(0) invert(1);
+  /* Makes the dark logo white on the dark panel */
+}
+
 /* ========= END AUTH MODAL v3 ========= */
