@@ -796,27 +796,13 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px; te
 }
 
 
-.auth-logo-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.auth-logo-icon {
-  width: 52px;
-  height: 52px;
+
+.auth-full-logo {
+  width: 190px;
+  max-width: 100%;
   object-fit: contain;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 12px rgba(79,130,255,0.5));
-}
-.auth-logo-wordmark {
-  font: 800 28px var(--font);
-  letter-spacing: 3px;
-  background: linear-gradient(135deg, #ffffff 0%, #a8c0ff 60%, #c8b8ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
+  margin-bottom: 16px;
+  /* logo-dark.png is designed for dark backgrounds — no filter needed */
 }
 
 /* ========= END AUTH MODAL v3 ========= */
