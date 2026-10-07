@@ -1,64 +1,106 @@
-﻿# EMTRIA: Evidence-Grounded Multimodal Traceable Reporting & Intelligence Architecture
+# EMTRIA — Evidence-Grounded Multimodal Traceable Reporting & Intelligence Architecture
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Hardware: RTX 4050 6GB](https://img.shields.io/badge/Hardware-RTX%204050%206GB-green.svg)](https://www.nvidia.com)
-[![Status: In Development](https://img.shields.io/badge/Status-Milestone%201%20Planning-orange.svg)](#-phased-development-milestones)
+<div align="center">
+
+<img src="logo-light.png" alt="EMTRIA Logo" width="380">
+
+<br/>
+<br/>
+
+[![Status](https://img.shields.io/badge/Status-UI%20Complete%20%7C%20In%20Development-brightgreen?style=for-the-badge)](https://github.com/samuelmichaelalva/third_year_mini_project_emtria)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Hardware](https://img.shields.io/badge/GPU-RTX%204050%206GB-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://www.nvidia.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Budget](https://img.shields.io/badge/Budget-%E2%82%B90%20Local%20%26%20Free-success?style=for-the-badge)](#-hardware--budget)
+
+**AI-assisted forensic decision-support system for preliminary crime-scene evidence analysis**
+
+*Every claim in the generated report must be traceable to a specific evidence reference — no hallucinations, no guesswork.*
+
+</div>
 
 ---
 
-## 📌 Project Overview
+## What is EMTRIA?
 
-**EMTRIA** (*Evidence-grounded Multimodal Traceable Reporting & Intelligence Architecture*) is an AI-assisted forensic decision-support framework designed to analyze preliminary crime-scene evidence across three modalities:
-- 📷 **Images**: Crime-scene photography & physical evidence localization.
-- 🎥 **Video**: Surveillance / CCTV footage & temporal event keyframe extraction.
-- 🎙️ **Audio**: Spoken dialogue, voice notes & emergency call speech transcription.
+**EMTRIA** (*Evidence-grounded Multimodal Traceable Reporting & Intelligence Architecture*) is a third-year IT mini-project that generates preliminary forensic crime-scene reports grounded entirely in uploaded evidence.
+
+It processes three modalities simultaneously:
+
+| Modality | Input | AI Model | Output |
+|---|---|---|---|
+| **Images** | Crime-scene photos, JPEG/PNG/WEBP | Florence-2-base | Bounding boxes + captions |
+| **Video** | CCTV/surveillance footage, MP4/MKV/MOV | OpenCV + Florence-2 | Keyframe timestamps + visual events |
+| **Audio** | Voice notes, emergency calls, WAV/MP3/FLAC | Whisper-base | Timestamped transcriptions |
 
 ### Core Mission
-> Generate preliminary forensic crime-scene reports in which **every claim presented as an evidence-based finding must be traceable to a corresponding evidence reference**, such as an image bounding box, video timestamp/frame, or audio timestamp.
+> Generate preliminary forensic reports where **every evidence-based finding is traceable** to an image bounding box, video timestamp/frame, or audio segment. No claim without a citation. No hallucination admitted.
 
-*EMTRIA is intended to assist forensic investigators during preliminary triage. It does not replace human experts, determine guilt or innocence, or make final legal conclusions.*
+*EMTRIA is a decision-support tool for preliminary triage. It does not replace forensic experts, establish guilt or innocence, or make final legal conclusions.*
 
 ---
 
-## 🏛️ System Architecture
+## Web Interface (UI — Current State)
 
-\\\mermaid
+The EMTRIA forensic dashboard is a fully functional single-page application (SPA) built with vanilla HTML/CSS/JS — no frameworks, no cloud dependencies.
+
+### Features Available Now
+
+| Feature | Status |
+|---|---|
+| **Officer Authentication Modal** — premium two-panel design | Live |
+| **1-Click Demo Login** (DET-4092 / emtria2026) | Live |
+| **Officer Badge Pill** in navbar after login | Live |
+| **Upload Gating** — authentication required to upload evidence | Live |
+| **Navigation Lock** — Step 2 & 3 blocked until evidence is uploaded | Live |
+| **Multi-file Evidence Upload** (Photos, Videos, Audio) with file chips | Live |
+| **Light / Dark Mode** toggle | Live |
+| **Forensic Canvas Background** (fingerprint + synapse animation) | Live |
+| **3-Step SPA** (Upload → Process Pipeline → Forensic Report) | Live |
+| **Report Print View** | Live |
+
+### Authentication Modal
+
+Users who click any upload action (dropzone, Add button, drag-and-drop, or Run AI Analysis) while unauthenticated are prompted with the Officer Access modal:
+
+- **Left panel**: Dark navy brand panel with EMTRIA logo, compliance badges (ISO/IEC 27037, SHA-256 Signed, Chain-of-Custody)
+- **Right panel**: 1-click Quick Demo access strip + manual Sign In / Register credential forms with clean icon inputs
+
+---
+
+## System Architecture
+
+```mermaid
 flowchart TD
     subgraph INPUTS["1. RAW EVIDENCE INPUTS"]
         direction LR
-        IMG_IN["📷 Images (.jpg/.png)"]
-        VID_IN["🎥 Video (.mp4)"]
-        AUD_IN["🎙️ Audio (.wav/.mp3)"]
+        IMG_IN["Images (.jpg/.png)"]
+        VID_IN["Video (.mp4)"]
+        AUD_IN["Audio (.wav/.mp3)"]
     end
 
     subgraph MODALITIES["2. MODALITY ANALYZERS (Sequential Execution)"]
         direction LR
-        M_IMG["<b>Image: Florence-2-base</b><br/>• Dense visual captioning<br/>• Phrase grounding<br/>• Bounding box coordinates"]
-        M_VID["<b>Video: OpenCV + Florence-2</b><br/>• Deterministic frame sampling<br/>• Timestamp extraction<br/>• Candidate visual analysis"]
-        M_AUD["<b>Audio: Whisper-base</b><br/>• Speech-to-text (ASR)<br/>• Timestamped dialogue segments"]
+        M_IMG["Image: Florence-2-base\n- Dense visual captioning\n- Phrase grounding\n- Bounding box coordinates"]
+        M_VID["Video: OpenCV + Florence-2\n- Deterministic frame sampling\n- Timestamp extraction\n- Candidate visual analysis"]
+        M_AUD["Audio: Whisper-base\n- Speech-to-text (ASR)\n- Timestamped dialogue segments"]
     end
 
     IMG_IN --> M_IMG
     VID_IN --> M_VID
     AUD_IN --> M_AUD
 
-    M_IMG --> CANDIDATE["<b>3. CANDIDATE OBSERVATIONS LAYER</b><br/>Status: candidate_observation | Coordinates | Timestamps"]
+    M_IMG --> CANDIDATE["3. CANDIDATE OBSERVATIONS LAYER\nStatus: candidate_observation | Coordinates | Timestamps"]
     M_VID --> CANDIDATE
     M_AUD --> CANDIDATE
 
-    CANDIDATE --> CORR["<b>4. TEMPORAL & CROSS-MODAL CORRELATION</b><br/>Aligns video timestamps with audio dialogue & tracks entities"]
-
-    CORR --> EVIDENCE_JSON["<b>5. STRUCTURED EVIDENCE JSON</b><br/>evidence_id • source • location • model confidence"]
-
-    EVIDENCE_JSON --> RULES["<b>6. DETERMINISTIC VALIDATION ENGINE</b><br/>Direct Observations | Cautious Inferences | Unverified Checks<br/>(Filters unsupported assumptions without LLM)"]
-
-    RULES --> LLM["<b>7. STRUCTURED CLAIMS GENERATOR (Local LLM)</b><br/>Ollama (Llama-3.2-3B) outputs structured JSON:<br/>{ claim, claim_type, evidence_ids }"]
-
-    LLM --> CHECKER{"<b>8. DETERMINISTIC CLAIM CHECKER</b><br/>Enforces valid evidence_id existence & schema"}
-
-    CHECKER -->|Valid Citations| REPORT["<b>9. INTERACTIVE FORENSIC REPORT</b><br/>Rendered report with clickable evidence links"]
-    CHECKER -->|Missing / Invalid ID| REJECT["<b>REJECT / UNVERIFIED FLAG</b><br/>Discards or flags ungrounded assertions"]
+    CANDIDATE --> CORR["4. TEMPORAL & CROSS-MODAL CORRELATION\nAligns video timestamps with audio dialogue & tracks entities"]
+    CORR --> EVIDENCE_JSON["5. STRUCTURED EVIDENCE JSON\nevidence_id - source - location - model confidence"]
+    EVIDENCE_JSON --> RULES["6. DETERMINISTIC VALIDATION ENGINE\nDirect Observations | Cautious Inferences | Unverified Checks"]
+    RULES --> LLM["7. STRUCTURED CLAIMS GENERATOR\nOllama Llama-3.2-3B outputs structured JSON\n{ claim, claim_type, evidence_ids }"]
+    LLM --> CHECKER{"8. DETERMINISTIC CLAIM CHECKER\nEnforces valid evidence_id existence & schema"}
+    CHECKER -->|Valid Citations| REPORT["9. INTERACTIVE FORENSIC REPORT\nClickable evidence references"]
+    CHECKER -->|Missing / Invalid ID| REJECT["REJECT / UNVERIFIED FLAG\nDiscards ungrounded assertions"]
 
     classDef primary fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
     classDef secondary fill:#0f172a,stroke:#64748b,stroke-width:1px,color:#e2e8f0;
@@ -68,56 +110,109 @@ flowchart TD
     class CANDIDATE,CORR,EVIDENCE_JSON,RULES,LLM,CHECKER primary;
     class REPORT highlight;
     class REJECT reject;
-\\\
+```
 
 ---
 
-## 🔒 Permanent Core Principles
+## Three Permanent Architectural Principles
 
-1. **No Evidence Reference $\rightarrow$ No Confirmed Finding**: If a claim cannot be mapped to an \evidence_id\, it is never admitted as a factual observation.
-2. **LLM Formats, Never Dictates Truth**: Language models are strictly bound to validated structured evidence.
-3. **Observation vs. Inference vs. Conclusion**:
-   - **Observation**: Directly confirmed digital evidence with coordinates or timestamps.
-   - **Inference**: Plausible context derived from observations, explicitly labeled with uncertainty.
-   - **Unverified**: Items requiring chemical, physical, or ballistic laboratory verification.
+### 1. No Evidence Reference — No Confirmed Finding
+If a claim cannot be mapped to a specific `evidence_id` (bounding box, frame timestamp, or audio segment), it is **never** admitted as a factual observation in the report.
 
----
+### 2. LLM Formats, Never Dictates Truth
+The language model (Llama-3.2-3B via Ollama) is **strictly bound** to the validated structured evidence JSON. It writes sentences — it does not invent facts.
 
-## 💻 Hardware & Execution Strategy (RTX 4050 6GB)
+### 3. Observation vs. Inference vs. Unverified
 
-To prevent CUDA Out-of-Memory (OOM) failures under 6GB VRAM, EMTRIA operates under a **Sequential Execution Pipeline**:
-
-\\\
-Load Florence-2 ➔ Process Visual Evidence ➔ Unload & Free VRAM
-Load Whisper-base ➔ Transcribe Audio ➔ Unload & Free VRAM
-Invoke Ollama (keep_alive=0) ➔ Synthesize Claims ➔ Release Memory
-\\\
-
-- **Target Laptop**: Acer Predator Helios Neo 16
-- **GPU**: NVIDIA GeForce RTX 4050 Laptop GPU (6 GB VRAM)
-- **RAM**: 16 GB DDR5
-- **Budget**: ₹0 (100% Local & Free / Open-Source)
+| Category | Definition | Report Color |
+|---|---|---|
+| **Direct Observation** | Confirmed digital evidence with coordinates/timestamps | Green |
+| **Cautious Inference** | Plausible context from observations — labeled uncertain | Purple |
+| **Lab Mandated** | Requires chemical/physical/ballistic lab verification | Red |
 
 ---
 
-## 🗺️ Phased Development Milestones
+## Hardware & Budget
 
-- [ ] **Milestone 1: Visual Evidence Grounding Prototype (EMTRIA-Core)**
-  - Interactive multi-page dashboard UI (Examiner Login, Cases, Workspace, Hardware Monitor).
-  - Florence-2-base visual candidate observation engine with bounding-box extraction.
-  - Verification on 10–30 reference crime-scene test images.
-- [ ] **Milestone 2: Video Sampling & Audio Timelines**
-  - OpenCV deterministic frame sampling + Whisper-base speech transcription.
-  - Temporal correlation layer aligning visual events with audio timestamps.
-- [ ] **Milestone 3: Deterministic Rules & Local LLM Synthesis**
-  - Python rules engine separating Observations vs. Inferences vs. Unverified items.
-  - Ollama structured claims generation and deterministic citation validator.
-- [ ] **Milestone 4: Interactive Grounded Forensic Dashboard & Academic Defense**
-  - Clickable report citations jumping to bounding boxes and video/audio seek times.
-  - Project documentation, defense PPT, and evaluation report.
+| Spec | Value |
+|---|---|
+| **Target Device** | Acer Predator Helios Neo 16 |
+| **GPU** | NVIDIA GeForce RTX 4050 Laptop GPU (6 GB VRAM) |
+| **RAM** | 16 GB DDR5 |
+| **OS** | Windows 11 |
+| **Budget** | Rs. 0 — 100% local, free & open-source |
+
+### VRAM Management Strategy
+
+To prevent CUDA Out-of-Memory errors under 6 GB VRAM, EMTRIA uses a **Sequential Execution Pipeline**:
+
+```
+Load Florence-2  →  Process Visual Evidence  →  Unload & Free VRAM
+Load Whisper-base  →  Transcribe Audio  →  Unload & Free VRAM
+Invoke Ollama (keep_alive=0)  →  Synthesize Claims  →  Release Memory
+```
 
 ---
 
-## 👥 Academic Context
-- **Project**: Third-Year Information Technology Mini-Project
-- **Architecture**: EMTRIA v2.1
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **UI** | HTML5, Vanilla CSS, Vanilla JS (SPA) |
+| **Vision Model** | Microsoft Florence-2-base (local) |
+| **Audio Model** | OpenAI Whisper-base (local) |
+| **Language Model** | Meta Llama-3.2-3B via Ollama (local) |
+| **Video Processing** | OpenCV |
+| **Backend** | Python 3.10+ |
+| **Auth Storage** | localStorage (client-side, chain-of-custody audit log) |
+
+---
+
+## Development Milestones
+
+- [x] **Milestone 0** — Blueprint frozen (EMTRIA v2.1), README, architecture diagram
+- [x] **Milestone 0.5** — Full forensic dashboard UI: officer auth modal, upload gating, navigation lock, 3-step SPA, light/dark mode, canvas animations, officer badge pill
+- [ ] **Milestone 1** — Florence-2-base visual candidate observation engine + bounding-box extraction, verified on 10-30 crime-scene reference images
+- [ ] **Milestone 2** — OpenCV frame sampler + Whisper-base transcription + temporal correlation layer
+- [ ] **Milestone 3** — Python deterministic rules engine + Ollama structured claims generator + citation validator
+- [ ] **Milestone 4** — Clickable report citations, full project documentation, defense PPT & evaluation report
+
+---
+
+## Running Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/samuelmichaelalva/third_year_mini_project_emtria.git
+cd third_year_mini_project_emtria
+
+# Serve the UI (Python built-in HTTP server)
+python -m http.server 8080
+```
+
+Then open **http://localhost:8080** in your browser.
+
+**Demo Credentials:**
+```
+Officer Badge ID:  DET-4092
+Password:          emtria2026
+```
+
+Or click the **Quick Demo Access** button inside the auth modal for instant 1-click login.
+
+---
+
+## Academic Context
+
+| Field | Detail |
+|---|---|
+| **Project Type** | Third-Year Information Technology Mini-Project |
+| **Domain** | AI-Assisted Forensic Computing |
+| **Architecture Version** | EMTRIA v2.1 (Blueprint Frozen) |
+| **Compliance Standard** | ISO/IEC 27037 Digital Evidence Handling |
+
+---
+
+<div align="center">
+<i>Built for academic purposes. EMTRIA does not constitute legal or forensic authority.</i>
+</div>
