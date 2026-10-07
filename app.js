@@ -11,7 +11,10 @@
 
   // Navigation & Dynamic Step 2 Sync
   window.go = function(n) {
-    // Navigation allows previewing Step 2 architecture
+    if ((n === 2 || n === 3) && totalFiles() === 0) {
+      showToast('Upload at least one evidence file before proceeding.', 'warn');
+      return;
+    }
     if (n === 2) syncPipeline();
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     $('step' + n).classList.add('active');
@@ -565,8 +568,9 @@
           '</div>';
       } else {
         slot.innerHTML =
-          '<button type="button" class="btn-officer-login" onclick="openAuthModal(\'Officer Authentication for Evidence Intake\')">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;display:inline-block;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Officer Access' +
+          '<button type="button" class="nav-lock-btn" id="nav-lock-trigger" onclick="openAuthModal(\'Sign in to upload &amp; process forensic evidence\')" title="Officer Login">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+            '<span>Officer Login</span>' +
           '</button>';
       }
     },
@@ -669,7 +673,7 @@
     if (reason && $('auth-gate-reason')) {
       $('auth-gate-reason').textContent = '\u26a0\ufe0f ' + reason;
     }
-    modal.style.display = 'flex';
+    modal.classList.add('open');
     switchAuthTab('signin');
     setTimeout(function() {
       const inp = $('signin-badge');
@@ -679,7 +683,7 @@
 
   window.closeAuthModal = function() {
     const modal = $('auth-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.classList.remove('open');
   };
 
   window.switchAuthTab = function(tab) {
